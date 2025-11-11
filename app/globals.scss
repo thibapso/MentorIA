@@ -1,11 +1,7 @@
-@use '../styles/reset';
-@use '../styles/variables' as v;
 @use '../styles/mixins' as m;
+@use '../styles/index';
 
 body {
-  background-color: v.$color-bg;
-  color: v.$color-text;
-  font-family: v.$font-main;
   @include m.flex-center;
   min-height: 100vh;
 }
