@@ -1,7 +1,27 @@
-@use '../styles/mixins' as m;
+@use '../styles/variables' as v;
 @use '../styles/index';
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600&family=Space+Grotesk:wght@400;700&display=swap');
+
+html {
+  scroll-behavior: smooth;
+  font-family: v.$font-text; // fonte padrão do site (texto)
+  color: v.$color-text;
+  background-color: v.$color-bg;
+}
 
 body {
-  display: block;
   min-height: 100vh;
+  line-height: 1.6;
+  font-family: inherit;
+  margin: 0;
+  padding: 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: v.$font-title; // títulos usam Space Grotesk
 }

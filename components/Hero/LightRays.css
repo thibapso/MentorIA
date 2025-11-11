@@ -6,5 +6,5 @@
   left: 0;
   overflow: hidden;
   pointer-events: none;
-  z-index: 1; /* ou -1 se quiser o conteúdo por cima */
+  z-index: 1;
 }
