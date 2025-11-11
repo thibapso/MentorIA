@@ -46,6 +46,22 @@ html {
   font-family: v.$font-text; // fonte padrão do site (texto)
   color: v.$color-text;
   background-color: v.$color-bg;
+
+  /* Selection customizada */
+  ::selection {
+    background-color: #1e40af; // azul escuro
+    color: #fff;
+    text-shadow: none;
+  }
+}
+
+[data-theme='dark'] {
+  html {
+    ::selection {
+      background-color: #1e3a8a; // azul ainda mais escuro para dark mode
+      color: #fff;
+    }
+  }
 }
 
 body {

@@ -1,7 +1,7 @@
 .hero {
   position: relative;
   width: 100%;
-  min-height: 100vh; // mais seguro que 100dvh para mobile
+  min-height: 100vh;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -20,7 +20,6 @@
   margin: 0 auto;
 }
 
-/* Nome pequeno acima do título */
 .name {
   display: block;
   font-size: 0.9rem;
@@ -34,10 +33,6 @@
   font-weight: 600;
   line-height: 1.2;
   margin-bottom: 1rem;
-
-  span {
-    color: #3b82f6;
-  }
 }
 
 .word {
@@ -46,6 +41,12 @@
   text-align: left;
   transition: transform 0.3s ease, opacity 0.3s ease;
   will-change: transform, opacity;
+
+  background: linear-gradient(135deg, #8ec5fc, #3b82f6); // azul claro → azul escuro
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
 }
 
 .subtitle {

@@ -1,15 +1,17 @@
 'use client'
 
 import Image from 'next/image'
-import { useEffect } from 'react'
 import Link from 'next/link'
+import { useEffect, useRef } from 'react'
 import { cycleWords } from '@/lib/animations/heroAnimations'
 import LightRays from './LightRays'
 import styles from './HeroSection.module.scss'
 
 export default function HeroSection() {
+  const wordRef = useRef<HTMLSpanElement | null>(null)
+
   useEffect(() => {
-    cycleWords()
+    cycleWords(wordRef.current)
   }, [])
 
   return (
@@ -20,7 +22,10 @@ export default function HeroSection() {
         <span className={styles.name}>MentorIA</span>
 
         <h1 className={styles.title}>
-          Às vezes, o que falta não é talento. É <span className="word">direção.</span>
+          Às vezes, o que falta não é talento. É{' '}
+          <span ref={wordRef} className={styles.word}>
+            direção.
+          </span>
         </h1>
 
         <p className={styles.subtitle}>
