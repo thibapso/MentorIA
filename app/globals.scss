@@ -2,6 +2,6 @@
 @use '../styles/index';
 
 body {
-  @include m.flex-center;
+  display: block;
   min-height: 100vh;
 }
