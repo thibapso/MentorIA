@@ -81,3 +81,31 @@ h6 {
   font-family: v.$font-title; // títulos usam Space Grotesk
 }
 
+// Lenis smooth scroll
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+// Reposicionar e redimensionar VLibras
+[vw] {
+  right: 100px !important;
+  transform: scale(0.85) !important;
+  transform-origin: bottom right !important;
+}

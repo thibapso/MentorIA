@@ -34,6 +34,8 @@ export default function Discover({ id }: DiscoverProps) {
       <div className={styles.container}>
         <div className={styles.small}>1</div>
         <div className={styles.small}>2</div>
+        <div className={styles.small}>3</div>
+        <div className={styles.small}>4</div>
         <div className={styles.large}>
           <Lanyard
             position={[0, 0, 20]}

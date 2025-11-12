@@ -4,13 +4,13 @@ export function cycleWords(wordElement: HTMLElement | null) {
   if (!wordElement) return
 
   const words = ['direção.', 'clareza.', 'uma chance.', 'MentorIA.']
-  const tl = gsap.timeline({ repeat: -1, repeatDelay: 0.4 }) // pequena pausa entre ciclos
+  const tl = gsap.timeline({ repeat: -1, repeatDelay: 0.4 }) 
 
   words.forEach((word, i) => {
     const isLast = i === words.length - 1
-    const fadeDuration = 0.3 // transição suave de opacidade
-    const moveDistance = 2.5 // leve movimento vertical
-    const holdDuration = isLast ? 1.5 : 1 // tempo de exibição da palavra
+    const fadeDuration = 0.3 
+    const moveDistance = 2.5 
+    const holdDuration = isLast ? 1.5 : 1
 
     tl.to(wordElement, {
       opacity: 0,
@@ -27,6 +27,6 @@ export function cycleWords(wordElement: HTMLElement | null) {
         duration: fadeDuration,
         ease: 'power1.inOut'
       })
-      .to({}, { duration: holdDuration }) // pausa antes da próxima palavra
+      .to({}, { duration: holdDuration }) 
   })
 }

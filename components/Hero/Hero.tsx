@@ -8,7 +8,11 @@ import LightRays from './LightRays'
 import HeroParticles from './HeroParticles'
 import styles from './Hero.module.scss'
 
-export default function Hero() {
+interface HeroProps {
+  id?: string;
+}
+
+export default function Hero({ id }: HeroProps) {
   const wordRef = useRef<HTMLSpanElement | null>(null)
 
   useEffect(() => {
@@ -16,7 +20,7 @@ export default function Hero() {
   }, [])
 
   return (
-    <section className={styles.hero}>
+    <section id={id} className={styles.hero}>
       <LightRays />
       <HeroParticles />
 
