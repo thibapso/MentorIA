@@ -1,4 +1,4 @@
-import Hero from '@/components/Hero/HeroSection'
+import Hero from '@/components/Hero/Hero'
 import Discover from '@/components/Discover/Discover'
 import Footer from '@/components/Footer/Footer'
 

@@ -6,9 +6,9 @@ import { useEffect, useRef } from 'react'
 import { cycleWords } from '@/lib/animations/heroAnimations'
 import LightRays from './LightRays'
 import HeroParticles from './HeroParticles'
-import styles from './HeroSection.module.scss'
+import styles from './Hero.module.scss'
 
-export default function HeroSection() {
+export default function Hero() {
   const wordRef = useRef<HTMLSpanElement | null>(null)
 
   useEffect(() => {

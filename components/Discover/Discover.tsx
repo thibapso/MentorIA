@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import styles from "./Discover.module.scss";
 import dynamic from "next/dynamic";
 
@@ -40,6 +41,15 @@ export default function Discover({ id }: DiscoverProps) {
             fov={20}
             transparent={true}
           />
+          <div className={styles.dragHint}>
+            <Image
+              src="/swipe.svg"
+              alt="Ícone de arrastar"
+              width={20}
+              height={20}
+            />
+            <span>Crachá interativo</span>
+          </div>
         </div>
       </div>
     </section>
