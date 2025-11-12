@@ -1,0 +1,25 @@
+@use '../../styles/variables' as v;
+
+.decryptedText {
+  font-family: v.$font-text;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 700;
+  color: rgba(255, 255, 255, 1);
+  text-align: center;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+  width: 100%;
+}
+
+.encrypted {
+  opacity: 0.3;
+  color: rgba(255, 255, 255, 0.5);
+  transition: opacity 0.1s ease;
+}
+
+.revealed {
+  opacity: 1;
+  color: rgba(255, 255, 255, 01);
+  transition: opacity 0.1s ease;
+}
+

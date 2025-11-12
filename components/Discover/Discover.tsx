@@ -3,8 +3,9 @@
 import Image from "next/image";
 import styles from "./Discover.module.scss";
 import dynamic from "next/dynamic";
+import DecryptedText from "../DecryptedText/DecryptedText";
+import decryptedStyles from "../DecryptedText/DecryptedText.module.scss";
 
-// Importação dinâmica do Lanyard para evitar problemas de SSR
 const Lanyard = dynamic(() => import("../Lanyard/Lanyard"), {
   ssr: false,
   loading: () => (
@@ -32,7 +33,20 @@ export default function Discover({ id }: DiscoverProps) {
   return (
     <section id={id} className={styles.discover}>
       <div className={styles.container}>
-        <div className={styles.small}>1</div>
+        <div className={styles.small}>
+          <DecryptedText
+            text="Desbloqueando futuros!"
+            animateOn="view"
+            speed={150}
+            sequential={true}
+            revealDirection="start"
+            loopInfinitely={true}
+            pauseDuration={3000}
+            className={decryptedStyles.revealed}
+            encryptedClassName={decryptedStyles.encrypted}
+            parentClassName={decryptedStyles.decryptedText}
+          />
+        </div>
         <div className={styles.small}>2</div>
         <div className={styles.small}>3</div>
         <div className={styles.small}>4</div>
