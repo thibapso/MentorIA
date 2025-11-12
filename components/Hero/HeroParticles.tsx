@@ -15,7 +15,7 @@ export default function HeroParticles() {
     let height = canvas.height = window.innerHeight
 
     const particles: { x: number; y: number; r: number; speed: number; drift: number }[] = []
-    const numParticles = 800
+    const numParticles = 1500
     const fadeZone = 150 
 
     for (let i = 0; i < numParticles; i++) {
