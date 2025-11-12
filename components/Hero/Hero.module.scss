@@ -32,6 +32,9 @@
     );
     z-index: 10;
     pointer-events: none;
+    will-change: auto;
+    backface-visibility: hidden;
+    transform: translateZ(0);
   }
 }
 

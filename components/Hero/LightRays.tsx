@@ -109,29 +109,9 @@ const LightRays: React.FC<LightRaysProps> = ({
   const animationIdRef = useRef<number | null>(null)
   const meshRef = useRef<Mesh | null>(null)
   const cleanupFunctionRef = useRef<(() => void) | null>(null)
-  const [isVisible, setIsVisible] = useState(false)
-  const observerRef = useRef<IntersectionObserver | null>(null)
-
-  useEffect(() => {
-    if (!containerRef.current) return
-
-    observerRef.current = new IntersectionObserver(
-      (entries) => {
-        const entry = entries[0]
-        setIsVisible(entry.isIntersecting)
-      },
-      { threshold: 0.1 }
-    )
-
-    observerRef.current.observe(containerRef.current)
-
-    return () => {
-      if (observerRef.current) {
-        observerRef.current.disconnect()
-        observerRef.current = null
-      }
-    }
-  }, [])
+  // Removido IntersectionObserver - inicializa imediatamente
+  // pois está na Hero que sempre é visível
+  const [isVisible] = useState(true)
 
   useEffect(() => {
     if (!isVisible || !containerRef.current) return
@@ -144,13 +124,12 @@ const LightRays: React.FC<LightRaysProps> = ({
     const initializeWebGL = async () => {
       if (!containerRef.current) return
 
-      await new Promise((resolve) => setTimeout(resolve, 10))
-
-      if (!containerRef.current) return
-
+      // Removido o delay para evitar flash durante scroll
       const renderer = new Renderer({
         dpr: Math.min(window.devicePixelRatio, 2),
-        alpha: true
+        alpha: true,
+        premultiplyAlpha: false,
+        preserveDrawingBuffer: false
       })
       rendererRef.current = renderer
 

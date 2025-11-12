@@ -32,29 +32,8 @@ export default function SmoothScroll() {
 
     gsap.ticker.lagSmoothing(0);
 
-    const sections = gsap.utils.toArray("section");
-
-    sections.forEach((section: any) => {
-      gsap.fromTo(
-        section,
-        {
-          opacity: 0.7,
-          y: 50,
-        },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 1,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: section,
-            start: "top 80%",
-            end: "top 20%",
-            toggleActions: "play none none reverse",
-          },
-        }
-      );
-    });
+    // Removido as animações de entrada das sections para evitar flicker
+    // O smooth scroll continua funcionando perfeitamente via Lenis
 
     return () => {
       lenis.destroy();

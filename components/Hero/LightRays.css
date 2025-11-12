@@ -7,4 +7,16 @@
   overflow: hidden;
   pointer-events: none;
   z-index: 1;
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
+  will-change: auto;
+}
+
+.light-rays-container canvas {
+  display: block;
+  opacity: 1;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
