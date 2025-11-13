@@ -26,6 +26,9 @@ import "./Lanyard.css";
 
 extend({ MeshLineGeometry, MeshLineMaterial });
 
+// Versão para cache busting - aumente este número quando trocar as imagens
+const ASSETS_VERSION = "2";
+
 interface LanyardProps {
   position?: [number, number, number];
   gravity?: [number, number, number];
@@ -43,6 +46,16 @@ export default function Lanyard({
   const [error, setError] = useState(false);
 
   useEffect(() => {
+    // Limpar cache do GLTFLoader e TextureLoader
+    if (typeof window !== 'undefined') {
+      try {
+        useGLTF.clear('/lanyard/card.glb');
+        useTexture.clear('/lanyard/lanyard.png');
+      } catch (e) {
+        // Ignorar erros se ainda não estiver no cache
+      }
+    }
+    
     // Delay para garantir que o DOM está pronto
     const timer = setTimeout(() => {
       setMounted(true);
@@ -177,8 +190,8 @@ function Band({ maxSpeed = 50, minSpeed = 0 }: BandProps) {
     linearDamping: 4,
   };
 
-  const { nodes, materials } = useGLTF("/lanyard/card.glb") as any;
-  const texture = useTexture("/lanyard/lanyard.png");
+  const { nodes, materials } = useGLTF(`/lanyard/card.glb?v=${ASSETS_VERSION}`) as any;
+  const texture = useTexture(`/lanyard/lanyard.png?v=${ASSETS_VERSION}`);
 
   const [curve] = useState(
     () =>
