@@ -5,55 +5,31 @@ import { useCallback, useEffect, useRef } from "react";
 import { useSpring } from "react-spring";
 
 // Conexões entre cidades (origem -> destino)
-const connections = [
-  [
-    [-23.5505, -46.6333],
-    [40.7128, -74.006],
-  ], // São Paulo -> Nova York
-  [
-    [40.7128, -74.006],
-    [51.5074, -0.1278],
-  ], // Nova York -> Londres
-  [
-    [51.5074, -0.1278],
-    [21.5433, 39.1728],
-  ], // Londres -> Jedá
-  [
-    [21.5433, 39.1728],
-    [1.3521, 103.8198],
-  ], // Jedá -> Singapura
-  [
-    [1.3521, 103.8198],
-    [35.6762, 139.6503],
-  ], // Singapura -> Tóquio
-  [
-    [35.6762, 139.6503],
-    [21.3099, -157.8581],
-  ], // Tóquio -> Hawaii
-  [
-    [-1.4558, -48.4902],
-    [-23.5505, -46.6333],
-  ], // Belém -> São Paulo
-  [
-    [51.1694, 71.4491],
-    [35.6762, 139.6503],
-  ], // Astana -> Tóquio
+const connections: [number[], number[]][] = [
+  [[-23.5505, -46.6333], [40.7128, -74.006]], // São Paulo -> Nova York
+  [[40.7128, -74.006], [51.5074, -0.1278]], // Nova York -> Londres
+  [[51.5074, -0.1278], [21.5433, 39.1728]], // Londres -> Jedá
+  [[21.5433, 39.1728], [1.3521, 103.8198]], // Jedá -> Singapura
+  [[1.3521, 103.8198], [35.6762, 139.6503]], // Singapura -> Tóquio
+  [[35.6762, 139.6503], [21.3099, -157.8581]], // Tóquio -> Hawaii
+  [[-1.4558, -48.4902], [-23.5505, -46.6333]], // Belém -> São Paulo
+  [[51.1694, 71.4491], [35.6762, 139.6503]], // Astana -> Tóquio
 ];
 
 const GLOBE_CONFIG: COBEOptions = {
   width: 1000,
   height: 1000,
-  onRender: () => {},
+  onRender: () => { },
   devicePixelRatio: 2,
   phi: 0,
   theta: 0.25,
   dark: 1,
-  diffuse: 0.25,
+  diffuse: 0.4,
   mapSamples: 16000,
-  mapBrightness: 1.85,
-  baseColor: [0.35, 0.35, 0.35], // Oceano: cinza mais claro
-  markerColor: [0.08, 0.2, 0.45], // Azul apagado/discreto
-  glowColor: [0.15, 0.15, 0.15], // Brilho igual ao oceano
+  mapBrightness: 3.2,
+  baseColor: [0.45, 0.45, 0.45],
+  markerColor: [0.08, 0.2, 0.45],
+  glowColor: [0.15, 0.15, 0.15],
   markers: [
     { location: [-1.4558, -48.4902], size: 0.06 }, // Belém
     { location: [-23.5505, -46.6333], size: 0.06 }, // São Paulo
@@ -65,17 +41,6 @@ const GLOBE_CONFIG: COBEOptions = {
     { location: [1.3521, 103.8198], size: 0.06 }, // Singapura
     { location: [51.1694, 71.4491], size: 0.06 }, // Astana
     { location: [-33.8688, 151.2093], size: 0.06 }, // Sydney
-    // Adiciona pontos intermediários para criar os arcos
-    ...connections.flatMap(([start, end]) => {
-      const steps = 20; // Número de pontos no arco
-      return Array.from({ length: steps }, (_, i) => ({
-        location: [
-          start[0] + ((end[0] - start[0]) * i) / steps,
-          start[1] + ((end[1] - start[1]) * i) / steps,
-        ] as [number, number],
-        size: 0.01, // Pontos pequenos para formar a linha
-      }));
-    }),
   ],
 };
 
@@ -86,28 +51,25 @@ export default function Globe({
   className?: string;
   config?: COBEOptions;
 }) {
-  let phi = 0;
-  let width = 0;
-  let animationTime = 0;
+  const phi = useRef(0);
+  const width = useRef(0);
+  const animationTime = useRef(0);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const pointerInteracting = useRef(null);
+  const pointerInteracting = useRef<number | null>(null);
   const pointerInteractionMovement = useRef(0);
+
   const [{ r }, api] = useSpring(() => ({
     r: 0,
-    config: {
-      mass: 1,
-      tension: 280,
-      friction: 40,
-      precision: 0.001,
-    },
+    config: { mass: 1, tension: 280, friction: 40, precision: 0.001 },
   }));
 
-  const updatePointerInteraction = (value: any) => {
+  const updatePointerInteraction = (value: number | null) => {
     pointerInteracting.current = value;
-    canvasRef.current!.style.cursor = value ? "grabbing" : "grab";
+    if (canvasRef.current)
+      canvasRef.current.style.cursor = value ? "grabbing" : "grab";
   };
 
-  const updateMovement = (clientX: any) => {
+  const updateMovement = (clientX: number) => {
     if (pointerInteracting.current !== null) {
       const delta = clientX - pointerInteracting.current;
       pointerInteractionMovement.current = delta;
@@ -116,54 +78,40 @@ export default function Globe({
   };
 
   const onRender = useCallback(
-    (state: Record<string, any>) => {
-      if (!pointerInteracting.current) phi += 0.005;
-      state.phi = phi + r.get();
-      state.width = width * 2;
-      state.height = width * 2;
+    (state: Record<string, unknown>) => {
+      if (!pointerInteracting.current) phi.current += 0.005;
+      state.phi = phi.current + r.get();
+      state.width = width.current * 2;
+      state.height = width.current * 2;
 
-      // Anima pontos ao longo das rotas
-      animationTime += 0.01;
-      const animatedMarkers = connections.flatMap(
-        ([start, end], routeIndex) => {
-          const numDots = 3; // 3 pontos por rota
-          return Array.from({ length: numDots }, (_, dotIndex) => {
-            // Calcula a posição do ponto ao longo da rota
-            const offset = dotIndex / numDots + animationTime * 0.3; // Velocidade
-            const progress = offset % 1; // Loop infinito
+      animationTime.current += 0.01;
+      const animatedMarkers = connections.flatMap(([start, end]) => {
+        const numDots = 3;
+        return Array.from({ length: numDots }, (_, dotIndex) => {
+          const offset = dotIndex / numDots + animationTime.current * 0.3;
+          const progress = offset % 1;
 
-            return {
-              location: [
-                start[0] + (end[0] - start[0]) * progress,
-                start[1] + (end[1] - start[1]) * progress,
-              ] as [number, number],
-              size: 0.03,
-            };
-          });
-        }
-      );
+          return {
+            location: [
+              start[0] + (end[0] - start[0]) * progress,
+              start[1] + (end[1] - start[1]) * progress,
+            ] as [number, number],
+            size: 0.03,
+          };
+        });
+      });
 
-      // Atualiza os marcadores com os pontos animados
       state.markers = [
-        { location: [-1.4558, -48.4902], size: 0.06 }, // Belém
-        { location: [-23.5505, -46.6333], size: 0.06 }, // São Paulo
-        { location: [40.7128, -74.006], size: 0.06 }, // Nova York
-        { location: [21.3099, -157.8581], size: 0.06 }, // Hawaii
-        { location: [51.5074, -0.1278], size: 0.06 }, // Londres
-        { location: [21.5433, 39.1728], size: 0.06 }, // Jedá
-        { location: [35.6762, 139.6503], size: 0.06 }, // Tóquio
-        { location: [1.3521, 103.8198], size: 0.06 }, // Singapura
-        { location: [51.1694, 71.4491], size: 0.06 }, // Astana
-        { location: [-33.8688, 151.2093], size: 0.06 }, // Sydney
+        ...config.markers!,
         ...animatedMarkers,
       ];
     },
-    [pointerInteracting, phi, r]
+    [pointerInteracting, r, config.markers]
   );
 
   const onResize = () => {
     if (canvasRef.current) {
-      width = canvasRef.current.offsetWidth;
+      width.current = canvasRef.current.offsetWidth;
     }
   };
 
@@ -172,25 +120,18 @@ export default function Globe({
     onResize();
 
     const globe = createGlobe(canvasRef.current!, {
-      devicePixelRatio: 2,
-      phi: 0,
-      theta: 0.25,
-      dark: 1,
-      diffuse: 0.25,
-      mapSamples: 16000,
-      mapBrightness: 2.45,
-      baseColor: [0.35, 0.35, 0.35],
-      markerColor: [0.08, 0.2, 0.45],
-      glowColor: [0.15, 0.15, 0.15],
-      markers: [],
-      width: width * 2,
-      height: width * 2,
+      ...config,
+      width: width.current * 2,
+      height: width.current * 2,
       onRender,
     });
 
-    setTimeout(() => (canvasRef.current!.style.opacity = "1"));
+    setTimeout(() => {
+      if (canvasRef.current) canvasRef.current.style.opacity = "1";
+    }, 300);
+
     return () => globe.destroy();
-  }, []);
+  }, [config, onRender]);
 
   return (
     <div
@@ -203,7 +144,6 @@ export default function Globe({
       }}
     >
       <canvas
-        className={className}
         ref={canvasRef}
         onPointerDown={(e) =>
           updatePointerInteraction(
