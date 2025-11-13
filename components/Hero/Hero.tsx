@@ -44,10 +44,10 @@ export default function Hero({ id }: HeroProps) {
           <Link href="#discover" className={styles.ctaPrimary}>
             Viva o novo
             <Image
-              src="/brain-cta.svg"
+              src="/cta.svg"
               alt="Ícone de cérebro"
-              width={20}
-              height={20}
+              width={15}
+              height={15}
             />
           </Link>
           <Link href="#" className={styles.ctaSecondary}>
