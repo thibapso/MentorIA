@@ -56,21 +56,21 @@ export default function Discover({ id }: DiscoverProps) {
               <Image
                 key="1"
                 src="/folder/1.webp"
-                alt="Documento 1"
+                alt="imagem de nuvens"
                 fill
                 style={{ objectFit: "cover" }}
               />,
               <Image
                 key="2"
                 src="/folder/2.webp"
-                alt="Documento 2"
+                alt="imagem do oceano"
                 fill
                 style={{ objectFit: "cover" }}
               />,
               <Image
                 key="3"
                 src="/folder/3.webp"
-                alt="Documento 3"
+                alt="imagem de prédios"
                 fill
                 style={{ objectFit: "cover" }}
               />,
