@@ -26,6 +26,25 @@ const Lanyard = dynamic(() => import("../Lanyard/Lanyard"), {
   ),
 });
 
+const Globe = dynamic(() => import("../Globe/Globe"), {
+  ssr: false,
+  loading: () => (
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        color: "#fff",
+        fontSize: "14px",
+      }}
+    >
+      Carregando globo...
+    </div>
+  ),
+});
+
 interface DiscoverProps {
   id?: string;
 }
@@ -77,7 +96,9 @@ export default function Discover({ id }: DiscoverProps) {
             ]}
           />
         </div>
-        <div className={styles.small}>3</div>
+        <div className={styles.small}>
+          <Globe />
+        </div>
         <div className={styles.small}>4</div>
         <div className={styles.large}>
           <Lanyard

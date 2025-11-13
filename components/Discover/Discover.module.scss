@@ -1,4 +1,4 @@
-@use '../../styles/variables' as v;
+@use "../../styles/variables" as v;
 
 .discover {
   width: 100%;
@@ -45,6 +45,7 @@
 .small:nth-child(3) {
   grid-row: 1 / 2;
   grid-column: 2 / 3;
+  padding: 0;
 }
 
 .small:nth-child(4) {
@@ -84,13 +85,13 @@
   font-family: "Poppins", sans-serif;
   z-index: 10;
   pointer-events: none;
-  
+
   svg {
     width: 20px;
     height: 20px;
     opacity: 0.9;
   }
-  
+
   span {
     font-weight: 500;
   }
