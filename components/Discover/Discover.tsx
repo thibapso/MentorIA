@@ -136,7 +136,7 @@ export default function Discover({ id }: DiscoverProps) {
               width={20}
               height={20}
             />
-            <span>Crachá interativo</span>
+            <span>Item interativo</span>
           </div>
         </div>
       </div>

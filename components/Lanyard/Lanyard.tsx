@@ -27,7 +27,7 @@ import "./Lanyard.css";
 extend({ MeshLineGeometry, MeshLineMaterial });
 
 // Versão para cache busting - aumente este número quando trocar as imagens
-const ASSETS_VERSION = "2";
+const ASSETS_VERSION = "4";
 
 interface LanyardProps {
   position?: [number, number, number];
@@ -51,6 +51,7 @@ export default function Lanyard({
       try {
         useGLTF.clear('/lanyard/card.glb');
         useTexture.clear('/lanyard/lanyard.png');
+        useTexture.clear('/lanyard/card_texture_nova.png');
       } catch (e) {
         // Ignorar erros se ainda não estiver no cache
       }
@@ -192,6 +193,14 @@ function Band({ maxSpeed = 50, minSpeed = 0 }: BandProps) {
 
   const { nodes, materials } = useGLTF(`/lanyard/card.glb?v=${ASSETS_VERSION}`) as any;
   const texture = useTexture(`/lanyard/lanyard.png?v=${ASSETS_VERSION}`);
+  const cardTexture = useTexture(`/lanyard/card_texture_nova.png?v=${ASSETS_VERSION}`);
+  
+  // Configurar textura do cartão
+  cardTexture.flipY = false;
+  
+  // Configurar textura do cordão
+  texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+  texture.needsUpdate = true;
 
   const [curve] = useState(
     () =>
@@ -287,7 +296,6 @@ function Band({ maxSpeed = 50, minSpeed = 0 }: BandProps) {
   });
 
   curve.curveType = "chordal";
-  texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 
   return (
     <>
@@ -352,7 +360,7 @@ function Band({ maxSpeed = 50, minSpeed = 0 }: BandProps) {
           >
             <mesh geometry={nodes.card.geometry}>
               <meshPhysicalMaterial
-                map={materials.base.map}
+                map={cardTexture}
                 map-anisotropy={16}
                 clearcoat={1}
                 clearcoatRoughness={0.15}
