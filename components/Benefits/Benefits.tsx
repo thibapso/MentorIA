@@ -3,6 +3,7 @@
 import CountUp from "./CountUp";
 import GlareHover from "./GlareHover";
 import SplitText from "@/components/ui/SplitText";
+import BounceCards from "./BounceCards";
 import styles from "./Benefits.module.scss";
 
 interface BenefitsProps {
@@ -145,7 +146,24 @@ export default function Benefits({ id }: BenefitsProps) {
         <div className={styles.bentoGrid}>
           <div className={styles.bentoCard}>
             <div className={styles.bentoContent}>
-              <h3 className={styles.bentoTitle}>A</h3>
+              <BounceCards
+                images={[
+                  "/creators/1.png",
+                  "/creators/2.png",
+                  "/creators/3.png",
+                ]}
+                containerWidth={450}
+                containerHeight={450}
+                animationDelay={1}
+                animationStagger={0.1}
+                easeType="elastic.out(1, 0.5)"
+                transformStyles={[
+                  "rotate(-8deg) translate(-115px)",
+                  "rotate(0deg)",
+                  "rotate(8deg) translate(115px)",
+                ]}
+                enableHover={true}
+              />
             </div>
             <p className={styles.bentoCaption}>
               Fundadores da{" "}
@@ -159,9 +177,7 @@ export default function Benefits({ id }: BenefitsProps) {
             <div className={styles.bentoContent}>
               <h3 className={styles.bentoTitle}>B</h3>
             </div>
-            <p className={styles.bentoCaption}>
-              Notificações de vagas e oportunidades
-            </p>
+            <p className={styles.bentoCaption}>Vagas e oportunidades</p>
           </div>
         </div>
       </div>
