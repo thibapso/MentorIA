@@ -104,12 +104,12 @@
 
   background: linear-gradient(
     120deg,
-    rgba(184, 203, 235, 0.95),
-    rgba(174, 212, 255, 0.75),
-    rgba(164, 203, 249, 0.7),
-    rgba(188, 216, 250, 0.9)
+    rgb(80, 143, 245) 0%,    /* azul vibrante */
+    rgb(90, 158, 247) 33%,   /* azul médio claro */
+    rgb(92, 141, 240) 66%,  /* azul claro */
+    rgb(72, 108, 199) 100%  /* azul bem suave */
   );
-
+  
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
