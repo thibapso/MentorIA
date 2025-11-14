@@ -4,6 +4,7 @@ import CountUp from "./CountUp";
 import GlareHover from "./GlareHover";
 import SplitText from "@/components/ui/SplitText";
 import BounceCards from "./BounceCards";
+import AnimatedList from "./AnimatedList";
 import styles from "./Benefits.module.scss";
 
 interface BenefitsProps {
@@ -175,7 +176,75 @@ export default function Benefits({ id }: BenefitsProps) {
 
           <div className={styles.bentoCard}>
             <div className={styles.bentoContent}>
-              <h3 className={styles.bentoTitle}>B</h3>
+              <AnimatedList
+                notifications={[
+                  {
+                    name: "Fullstack Engineer",
+                    message: "Microsoft - Vaga remota disponível",
+                    time: "5h atrás",
+                    icon: "/business/2.png",
+                  },
+                  {
+                    name: "React Developer",
+                    message: "Amazon - Salário acima da média",
+                    time: "1d atrás",
+                    icon: "/business/2.png",
+                  },
+                  {
+                    name: "Backend Developer",
+                    message: "Meta - Oportunidade senior remota",
+                    time: "3h atrás",
+                    icon: "/business/1.png",
+                  },
+                  {
+                    name: "DevOps Engineer",
+                    message: "Netflix - Infraestrutura cloud",
+                    time: "6h atrás",
+                    icon: "/business/3.png",
+                  },
+                  {
+                    name: "Mobile Developer",
+                    message: "Apple - Desenvolvimento iOS nativo",
+                    time: "8h atrás",
+                    icon: "/business/2.png",
+                  },
+                  {
+                    name: "UI/UX Designer",
+                    message: "Spotify - Design de interfaces",
+                    time: "12h atrás",
+                      icon: "/business/2.png",
+                  },
+                  {
+                    name: "Data Engineer",
+                    message: "Tesla - Análise de dados em tempo real",
+                    time: "1d atrás",
+                    icon: "/business/3.png",
+                  },
+                  {
+                    name: "Product Manager",
+                    message: "Uber - Gestão de produtos digitais",
+                    time: "2d atrás",
+                    icon: "/business/1.png",
+                  },
+                  {
+                    name: "Tech Lead",
+                    message: "Nubank - Liderança técnica",
+                    time: "3d atrás",
+                    icon: "/business/1.png",
+                  },
+                  {
+                    name: "Analista de Dados",
+                    message: "Cielo - Análise de dados",
+                    time: "7h atrás",
+                    icon: "/business/2.png",
+                  },
+                ]}
+                stackGap={20}
+                columnGap={85}
+                scaleFactor={0.05}
+                scrollDownDuration={5}
+                formationDuration={1}
+              />
             </div>
             <p className={styles.bentoCaption}>Vagas e oportunidades</p>
           </div>
