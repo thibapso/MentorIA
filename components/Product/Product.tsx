@@ -1,7 +1,7 @@
 "use client";
 
 import styles from "./Product.module.scss";
-import SplitText from "@/components/ui/SplitText";
+import Typewriter from "@/components/ui/Typewriter";
 
 interface ProductProps {
   id?: string;
@@ -11,19 +11,13 @@ export default function Product({ id }: ProductProps) {
   return (
     <section id={id} className={styles.product}>
       <div className={styles.container}>
-        <SplitText
+        <Typewriter
           text="Transforme seu Currículo"
           className={styles.title}
           tag="h2"
-          delay={50}
-          duration={0.6}
-          ease="power3.out"
-          splitType="chars"
-          from={{ opacity: 0, y: 40 }}
-          to={{ opacity: 1, y: 0 }}
-          threshold={0.2}
-          rootMargin="-50px"
-          textAlign="center"
+          speed={80}
+          delay={200}
+          showCursor={false}
         />
       </div>
     </section>
