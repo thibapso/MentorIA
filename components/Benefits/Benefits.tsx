@@ -2,6 +2,7 @@
 
 import CountUp from "./CountUp";
 import GlareHover from "./GlareHover";
+import SplitText from "@/components/ui/SplitText";
 import styles from "./Benefits.module.scss";
 
 interface BenefitsProps {
@@ -12,7 +13,20 @@ export default function Benefits({ id }: BenefitsProps) {
   return (
     <section id={id} className={styles.benefits}>
       <div className={styles.container}>
-        <h2 className={styles.title}>Desempenho e Confiabilidade</h2>
+        <SplitText
+          text="Desempenho e Confiabilidade"
+          className={styles.title}
+          tag="h2"
+          delay={50}
+          duration={0.6}
+          ease="power3.out"
+          splitType="chars"
+          from={{ opacity: 0, y: 40 }}
+          to={{ opacity: 1, y: 0 }}
+          threshold={0.2}
+          rootMargin="-50px"
+          textAlign="center"
+        />
 
         <div className={styles.stats}>
           <GlareHover

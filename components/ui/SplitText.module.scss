@@ -1,0 +1,34 @@
+.split-parent {
+  display: inline-block;
+  overflow: visible;
+  background: none !important;
+  -webkit-text-fill-color: #fff !important;
+  background-clip: unset !important;
+  -webkit-background-clip: unset !important;
+}
+
+.split-line,
+.split-word,
+.split-char {
+  display: inline-block;
+  overflow: visible;
+  will-change: transform, opacity;
+  color: #fff !important;
+  background: none !important;
+  -webkit-text-fill-color: #fff !important;
+}
+
+.split-line {
+  display: block;
+}
+
+.split-word {
+  white-space: nowrap;
+  margin-right: 0.25em;
+}
+
+.split-char {
+  display: inline-block;
+  transform-origin: center;
+}
+
