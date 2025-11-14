@@ -84,15 +84,7 @@ export const TextHoverEffect = ({
           textAnchor="middle"
           dominantBaseline="middle"
           strokeWidth="0.3"
-          style={{
-            fontFamily: "helvetica, arial, sans-serif",
-            fontWeight: "bold",
-            fontSize: "4.5rem",
-            fill: "transparent",
-            stroke: "rgba(229, 231, 235, 0.08)",
-            opacity: hovered ? 0.5 : 0,
-            userSelect: "none",
-          }}
+          className={`${styles.svgText} ${styles.backgroundText} ${hovered ? styles.hovered : ''}`}
         >
           {text}
         </text>
@@ -102,14 +94,7 @@ export const TextHoverEffect = ({
           textAnchor="middle"
           dominantBaseline="middle"
           strokeWidth="0.3"
-          style={{
-            fontFamily: "helvetica, arial, sans-serif",
-            fontWeight: "bold",
-            fontSize: "4.5rem",
-            fill: "transparent",
-            stroke: "rgba(229, 231, 235, 0.08)",
-            userSelect: "none",
-          }}
+          className={`${styles.svgText} ${styles.animatedText}`}
           initial={{ strokeDashoffset: 1000, strokeDasharray: 1000 }}
           animate={{
             strokeDashoffset: 0,
@@ -130,13 +115,7 @@ export const TextHoverEffect = ({
           stroke="url(#textGradient)"
           strokeWidth="0.3"
           mask="url(#textMask)"
-          style={{
-            fontFamily: "helvetica, arial, sans-serif",
-            fontWeight: "bold",
-            fontSize: "4.5rem",
-            fill: "transparent",
-            userSelect: "none",
-          }}
+          className={`${styles.svgText} ${styles.gradientText}`}
         >
           {text}
         </text>

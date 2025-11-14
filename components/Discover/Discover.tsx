@@ -93,6 +93,7 @@ export default function Discover({ id }: DiscoverProps) {
                 src="/folder/1.webp"
                 alt="imagem de nuvens"
                 fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 style={{ objectFit: "cover" }}
               />,
               <Image
@@ -100,6 +101,7 @@ export default function Discover({ id }: DiscoverProps) {
                 src="/folder/2.webp"
                 alt="imagem do oceano"
                 fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 style={{ objectFit: "cover" }}
               />,
               <Image
@@ -107,6 +109,7 @@ export default function Discover({ id }: DiscoverProps) {
                 src="/folder/3.webp"
                 alt="imagem de prédios"
                 fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 style={{ objectFit: "cover" }}
               />,
             ]}

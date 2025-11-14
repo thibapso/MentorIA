@@ -14,3 +14,28 @@
   }
 }
 
+.svgText {
+  font-family: helvetica, arial, sans-serif;
+  font-weight: bold;
+  font-size: 4.5rem;
+  fill: transparent;
+  user-select: none;
+}
+
+.backgroundText {
+  stroke: rgba(229, 231, 235, 0.08);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  
+  &.hovered {
+    opacity: 0.5;
+  }
+}
+
+.animatedText {
+  stroke: rgba(229, 231, 235, 0.08);
+}
+
+.gradientText {
+  // stroke will be set inline with url(#textGradient)
+}
