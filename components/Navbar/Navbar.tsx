@@ -20,10 +20,10 @@ export default function Navbar() {
             <Link href="#discover">Descubra</Link>
           </li>
           <li>
-            <Link href="/">Produto</Link>
+            <Link href="">Produto</Link>
           </li>
           <li>
-            <Link href="/">Benefícios</Link>
+            <Link href="#benefits">Benefícios</Link>
           </li>
         </ul>
       </div>

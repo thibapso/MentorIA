@@ -1,5 +1,6 @@
 import Hero from '@/components/Hero/Hero'
 import Discover from '@/components/Discover/Discover'
+import Benefits from '@/components/Benefits/Benefits'
 import Footer from '@/components/Footer/Footer'
 
 import Navbar from '@/components/Navbar/Navbar'
@@ -15,6 +16,7 @@ export default function Home() {
       <SectionIndicator />
       <Hero id="hero" />
       <Discover id="discover"/>
+      <Benefits id="benefits"/>
       <Footer id="footer" />
       <BackToTop />
     </>
