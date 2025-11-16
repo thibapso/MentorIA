@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 
+// Converte array JavaScript em string PostgreSQL array
+function stringifyCompetencias(competencias: string[]): string {
+  return `{${competencias.map(item => `"${item}"`).join(', ')}}`
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -30,12 +35,17 @@ export async function PUT(
     const body = await request.json()
     const { area, competencias } = body
 
+    const updateData: any = {}
+    if (area) updateData.area = area
+    if (competencias) {
+      updateData.competencias = Array.isArray(competencias) 
+        ? stringifyCompetencias(competencias)
+        : competencias
+    }
+
     const skill = await prisma.skillsMatch.update({
       where: { id: parseInt(id) },
-      data: {
-        ...(area && { area }),
-        ...(competencias && { competencias })
-      }
+      data: updateData
     })
 
     return NextResponse.json(skill)

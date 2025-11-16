@@ -36,6 +36,11 @@ function parseCompetencias(value: string | string[]): string[] {
   return []
 }
 
+// Converte array JavaScript em string PostgreSQL array
+function stringifyCompetencias(competencias: string[]): string {
+  return `{${competencias.map(item => `"${item}"`).join(', ')}}`
+}
+
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
@@ -79,7 +84,10 @@ export async function POST(request: NextRequest) {
     }
 
     const skill = await prisma.skillsMatch.create({
-      data: { area, competencias }
+      data: { 
+        area, 
+        competencias: stringifyCompetencias(competencias)
+      }
     })
 
     return NextResponse.json(skill, { status: 201 })
