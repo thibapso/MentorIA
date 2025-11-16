@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "prisma:generate": "prisma generate",
+    "prisma:studio": "prisma studio"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
@@ -32,11 +34,14 @@
     "three.meshline": "^1.4.0"
   },
   "devDependencies": {
+    "@prisma/client": "^6.19.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.0.1",
+    "prisma": "^6.19.0",
+    "tsx": "^4.20.6",
     "typescript": "^5"
   }
 }

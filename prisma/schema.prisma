@@ -1,0 +1,20 @@
+// Schema do PathFindr - Conectando com Supabase
+// Banco de dados simplificado para Framework Application - FIAP
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Tabela de Skills Match (sua tabela existente no Supabase)
+model SkillsMatch {
+  id           Int      @id @default(autoincrement())
+  area         String
+  competencias String   // Armazenado como string, fazemos parse depois
+  
+  @@map("skills_match")
+}
