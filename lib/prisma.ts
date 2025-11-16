@@ -1,8 +1,5 @@
 import { PrismaClient } from '@prisma/client'
 
-// Configuração do cliente Prisma com singleton pattern
-// Isso evita criar múltiplas instâncias em desenvolvimento
-
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
 }
