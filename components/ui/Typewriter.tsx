@@ -22,7 +22,7 @@ export default function Typewriter({
   const [displayedText, setDisplayedText] = useState("");
   const [isVisible, setIsVisible] = useState(false);
   const [hasAnimated, setHasAnimated] = useState(false);
-  const elementRef = useRef<HTMLElement>(null);
+  const elementRef = useRef<any>(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
