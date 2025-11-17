@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { getAreas, getAllSkills } from '@/lib/api-client'
 import styles from './SkillsComparison.module.scss'
 import { AnimatePresence, motion } from 'framer-motion'
+import jsPDF from 'jspdf'
 
 interface ComparisonResult {
   matches: number
@@ -255,6 +256,131 @@ export default function SkillsComparison() {
     }
   }
 
+  const downloadJSON = () => {
+    if (!comparisonResult || !selectedArea) return
+
+    const data = {
+      area: selectedArea,
+      porcentagem: Math.round((comparisonResult.matches / comparisonResult.total) * 100),
+      analise: comparisonResult.analysis,
+      competencias: {
+        possui: {
+          quantidade: comparisonResult.matchedSkills.length,
+          lista: comparisonResult.matchedSkills
+        },
+        desenvolver: {
+          quantidade: comparisonResult.missingSkills.length,
+          lista: comparisonResult.missingSkills
+        }
+      },
+      total: comparisonResult.total,
+      dataAnalise: new Date().toLocaleString('pt-BR')
+    }
+
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    const timestamp = new Date().toISOString().split('T')[0] // YYYY-MM-DD
+    a.download = `MentorIA-analise-${timestamp}.json`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
+  const downloadPDF = () => {
+    if (!comparisonResult || !selectedArea) return
+
+    const doc = new jsPDF()
+    const matchPercentage = Math.round((comparisonResult.matches / comparisonResult.total) * 100)
+    
+    // Header
+    doc.setFontSize(24)
+    doc.setTextColor(59, 130, 246)
+    doc.text('MentorIA', 20, 20)
+    
+    doc.setFontSize(20)
+    doc.setTextColor(0, 0, 0)
+    doc.text('Análise de Competências', 20, 35)
+    
+    // Área e Data
+    doc.setFontSize(12)
+    doc.setTextColor(100, 100, 100)
+    doc.text(`Área: ${selectedArea}`, 20, 50)
+    doc.text(`Data: ${new Date().toLocaleString('pt-BR')}`, 20, 58)
+    
+    // Match Score
+    doc.setFontSize(16)
+    doc.setTextColor(59, 130, 246)
+    doc.text(`Match: ${matchPercentage}%`, 20, 75)
+    
+    doc.setFontSize(11)
+    doc.setTextColor(0, 0, 0)
+    doc.text(`${comparisonResult.matches} de ${comparisonResult.total} competências encontradas`, 20, 83)
+    
+    // Análise
+    doc.setFontSize(10)
+    doc.setTextColor(80, 80, 80)
+    const splitAnalysis = doc.splitTextToSize(comparisonResult.analysis, 170)
+    doc.text(splitAnalysis, 20, 95)
+    
+    let yPosition = 95 + (splitAnalysis.length * 5) + 10
+    
+    // Você possui
+    doc.setFontSize(14)
+    doc.setTextColor(59, 130, 246)
+    doc.text(`Você possui (${comparisonResult.matchedSkills.length})`, 20, yPosition)
+    
+    yPosition += 8
+    doc.setFontSize(10)
+    doc.setTextColor(0, 0, 0)
+    comparisonResult.matchedSkills.forEach((skill, index) => {
+      if (yPosition > 270) {
+        doc.addPage()
+        yPosition = 20
+      }
+      doc.text(`• ${skill}`, 25, yPosition)
+      yPosition += 6
+    })
+    
+    yPosition += 5
+    
+    // Para desenvolver
+    if (yPosition > 250) {
+      doc.addPage()
+      yPosition = 20
+    }
+    
+    doc.setFontSize(14)
+    doc.setTextColor(59, 130, 246)
+    doc.text(`Para desenvolver (${comparisonResult.missingSkills.length})`, 20, yPosition)
+    
+    yPosition += 8
+    doc.setFontSize(10)
+    doc.setTextColor(0, 0, 0)
+    comparisonResult.missingSkills.forEach((skill, index) => {
+      if (yPosition > 270) {
+        doc.addPage()
+        yPosition = 20
+      }
+      doc.text(`• ${skill}`, 25, yPosition)
+      yPosition += 6
+    })
+    
+    // Footer
+    const pageCount = doc.getNumberOfPages()
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i)
+      doc.setFontSize(8)
+      doc.setTextColor(150, 150, 150)
+      doc.text(`Página ${i} de ${pageCount} - MentorIA © ${new Date().getFullYear()}`, 20, 285)
+    }
+    
+    const timestamp = new Date().toISOString().split('T')[0] // YYYY-MM-DD
+    doc.save(`MentorIA-analise-${timestamp}.pdf`)
+  }
+
   return (
     <div className={styles.comparisonContainer}>
       {/* Seção 1: Seleção de Área */}
@@ -423,7 +549,35 @@ export default function SkillsComparison() {
       {comparisonResult && (
         <div className={styles.resultSection}>
           <div className={styles.resultHeader}>
-            <h3>Resultado da Análise</h3>
+            <div className={styles.resultTitleGroup}>
+              <h3>Resultado da Análise</h3>
+              <div className={styles.downloadButtons}>
+                <button 
+                  onClick={downloadJSON} 
+                  className={styles.downloadButton}
+                  title="Baixar como JSON"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <polyline points="7 10 12 15 17 10" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <line x1="12" y1="15" x2="12" y2="3" strokeWidth="2" strokeLinecap="round"/>
+                  </svg>
+                  JSON
+                </button>
+                <button 
+                  onClick={downloadPDF} 
+                  className={styles.downloadButton}
+                  title="Baixar como PDF"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <polyline points="7 10 12 15 17 10" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <line x1="12" y1="15" x2="12" y2="3" strokeWidth="2" strokeLinecap="round"/>
+                  </svg>
+                  PDF
+                </button>
+              </div>
+            </div>
             <div 
               className={styles.scoreCircle}
               style={{
