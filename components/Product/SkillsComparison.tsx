@@ -218,7 +218,7 @@ export default function SkillsComparison() {
   return (
     <div className={styles.comparisonContainer}>
       {/* Seção 1: Seleção de Área */}
-      <div className={styles.section}>
+      <div className={styles.section} style={{ zIndex: 100 }}>
         <div className={styles.sectionHeader}>
           <span className={styles.stepNumber}>1</span>
           <h3 className={styles.sectionTitle}>Selecione sua Área Profissional</h3>
@@ -279,7 +279,7 @@ export default function SkillsComparison() {
 
       {/* Seção 2: Competências da Área */}
       {selectedArea && (
-        <div className={styles.section}>
+        <div className={styles.section} style={{ zIndex: 50 }}>
           <div className={styles.sectionHeader}>
             <span className={styles.stepNumber}>2</span>
             <h3 className={styles.sectionTitle}>
@@ -311,7 +311,7 @@ export default function SkillsComparison() {
 
       {/* Seção 3: Dados do Usuário */}
       {selectedArea && (
-        <div className={styles.section}>
+        <div className={styles.section} style={{ zIndex: 25 }}>
           <div className={styles.sectionHeader}>
             <span className={styles.stepNumber}>3</span>
             <h3 className={styles.sectionTitle}>Adicione seus Dados</h3>

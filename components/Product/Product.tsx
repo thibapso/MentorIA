@@ -16,8 +16,8 @@ export default function Product({ id }: ProductProps) {
           text="Compare suas Competências"
           className={styles.title}
           tag="h2"
-          speed={80}
-          delay={200}
+          speed={50}
+          delay={0}
           showCursor={false}
         />
         

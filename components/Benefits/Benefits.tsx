@@ -19,8 +19,8 @@ export default function Benefits({ id }: BenefitsProps) {
           text="Desempenho e Confiabilidade"
           className={styles.title}
           tag="h2"
-          speed={80}
-          delay={200}
+          speed={50}
+          delay={0}
           showCursor={false}
         />
 
