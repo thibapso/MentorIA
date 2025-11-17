@@ -1,0 +1,709 @@
+'use client'
+
+import { useState, useEffect, useRef } from 'react'
+import { getAreas, getAllSkills } from '@/lib/api-client'
+import styles from './SkillsComparison.module.scss'
+import { AnimatePresence, motion } from 'framer-motion'
+import jsPDF from 'jspdf'
+import * as pdfjsLib from 'pdfjs-dist'
+
+// Configurar worker do PDF.js
+if (typeof window !== 'undefined') {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs'
+}
+
+interface ComparisonResult {
+  matches: number
+  total: number
+  matchedSkills: string[]
+  missingSkills: string[]
+  analysis: string
+  method: 'ai' | 'simple'
+}
+
+export default function SkillsComparison() {
+  const [areas, setAreas] = useState<string[]>([])
+  const [inputValue, setInputValue] = useState('')
+  const [isOpen, setIsOpen] = useState(false)
+  const [selectedIndex, setSelectedIndex] = useState(-1)
+  const [selectedArea, setSelectedArea] = useState<string | null>(null)
+  const [currentPlaceholder, setCurrentPlaceholder] = useState(0)
+  const [areaSkills, setAreaSkills] = useState<string[]>([])
+  const [selectedSkills, setSelectedSkills] = useState<Set<string>>(new Set())
+  const [loadingSkills, setLoadingSkills] = useState(false)
+  const [userData, setUserData] = useState('')
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null)
+  const [isComparing, setIsComparing] = useState(false)
+  const [comparisonResult, setComparisonResult] = useState<ComparisonResult | null>(null)
+
+  const inputRef = useRef<HTMLInputElement>(null)
+  const autocompleteRef = useRef<HTMLDivElement>(null)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const intervalRef = useRef<NodeJS.Timeout | null>(null)
+
+  const placeholders = [
+    "Ex: Desenvolvimento Front-End",
+    "Ex: Data Science",
+    "Ex: Desenvolvimento Back-End",
+    "Ex: DevOps",
+    "Ex: UX/UI Design",
+    "Ex: Análise de Dados",
+  ]
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    getAreas().then(setAreas).catch(console.error)
+  }, [])
+
+  // Animated placeholders
+  useEffect(() => {
+    const startAnimation = () => {
+      intervalRef.current = setInterval(() => {
+        setCurrentPlaceholder((prev) => (prev + 1) % placeholders.length)
+      }, 3000)
+    }
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState !== "visible" && intervalRef.current) {
+        clearInterval(intervalRef.current)
+        intervalRef.current = null
+      } else if (document.visibilityState === "visible") {
+        startAnimation()
+      }
+    }
+
+    startAnimation()
+    document.addEventListener("visibilitychange", handleVisibilityChange)
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+      }
+      document.removeEventListener("visibilitychange", handleVisibilityChange)
+    }
+  }, [])
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (autocompleteRef.current && !autocompleteRef.current.contains(event.target as Node)) {
+        setIsOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  useEffect(() => {
+    if (!isOpen || !dropdownRef.current) return
+
+    const dropdown = dropdownRef.current
+
+    const handleWheel = (e: WheelEvent) => {
+      e.stopPropagation()
+      e.preventDefault()
+      
+      dropdown.scrollTop += e.deltaY
+    }
+
+    dropdown.addEventListener('wheel', handleWheel, { passive: false })
+    return () => dropdown.removeEventListener('wheel', handleWheel)
+  }, [isOpen])
+
+  useEffect(() => {
+    const textarea = textareaRef.current
+    if (!textarea) return
+
+    const handleWheel = (e: WheelEvent) => {
+      const target = e.currentTarget as HTMLTextAreaElement
+      const isScrollable = target.scrollHeight > target.clientHeight
+      
+      if (isScrollable) {
+        e.stopPropagation()
+        e.preventDefault()
+        
+        target.scrollTop += e.deltaY
+      }
+    }
+
+    textarea.addEventListener('wheel', handleWheel, { passive: false })
+    return () => textarea.removeEventListener('wheel', handleWheel)
+  }, [selectedArea])
+
+  const filteredAreas = areas.filter(area =>
+    area.toLowerCase().includes(inputValue.toLowerCase())
+  )
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    setInputValue(value)
+    setIsOpen(value.length > 0)
+    setSelectedIndex(-1)
+  }
+
+  const handleSearchClick = () => {
+    if (inputValue) {
+      setIsOpen(true)
+    } else {
+      inputRef.current?.focus()
+    }
+  }
+
+  const handleSelect = async (area: string) => {
+    setInputValue(area)
+    setIsOpen(false)
+    setSelectedIndex(-1)
+    setSelectedArea(area)
+    setLoadingSkills(true)
+    
+    try {
+      const skills = await getAllSkills({ area })
+      if (skills.length > 0) {
+        const competencias = skills[0].competencias
+        setAreaSkills(competencias)
+        // Todas as competências vêm selecionadas por padrão
+        setSelectedSkills(new Set(competencias))
+      }
+    } catch (error) {
+      console.error('Erro ao buscar competências:', error)
+    } finally {
+      setLoadingSkills(false)
+    }
+  }
+
+  const toggleSkill = (skill: string) => {
+    setSelectedSkills(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(skill)) {
+        newSet.delete(skill)
+      } else {
+        newSet.add(skill)
+      }
+      return newSet
+    })
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!isOpen || filteredAreas.length === 0) return
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault()
+        setSelectedIndex(prev => 
+          prev < filteredAreas.length - 1 ? prev + 1 : prev
+        )
+        break
+      case 'ArrowUp':
+        e.preventDefault()
+        setSelectedIndex(prev => prev > 0 ? prev - 1 : -1)
+        break
+      case 'Enter':
+        e.preventDefault()
+        if (selectedIndex >= 0) {
+          handleSelect(filteredAreas[selectedIndex])
+        }
+        break
+      case 'Escape':
+        setIsOpen(false)
+        setSelectedIndex(-1)
+        break
+    }
+  }
+
+  const extractTextFromPDF = async (file: File): Promise<string> => {
+    try {
+      const arrayBuffer = await file.arrayBuffer()
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise
+      let fullText = ''
+
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i)
+        const textContent = await page.getTextContent()
+        const pageText = textContent.items
+          .map((item: any) => item.str)
+          .join(' ')
+        fullText += pageText + '\n'
+      }
+
+      return fullText.trim()
+    } catch (error) {
+      console.error('Erro ao extrair texto do PDF:', error)
+      throw new Error('Não foi possível ler o PDF')
+    }
+  }
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Validar tipo de arquivo
+    const validTypes = ['text/plain', 'application/pdf']
+    const validExtensions = ['.txt', '.pdf']
+    const fileExtension = file.name.toLowerCase().slice(file.name.lastIndexOf('.'))
+    
+    if (!validTypes.includes(file.type) && !validExtensions.includes(fileExtension)) {
+      alert('⚠️ Por favor, faça upload apenas de arquivos .txt ou .pdf\n\nPara arquivos DOC/DOCX, copie o conteúdo e cole no campo de texto.')
+      e.target.value = ''
+      return
+    }
+
+    // Validar tamanho (máx 5MB para PDF, 1MB para TXT)
+    const maxSize = file.type === 'application/pdf' || fileExtension === '.pdf' ? 5 * 1024 * 1024 : 1 * 1024 * 1024
+    if (file.size > maxSize) {
+      const maxSizeText = file.type === 'application/pdf' || fileExtension === '.pdf' ? '5MB' : '1MB'
+      alert(`⚠️ Arquivo muito grande!\n\nO arquivo deve ter no máximo ${maxSizeText}. Tente um arquivo menor ou cole o texto diretamente.`)
+      e.target.value = ''
+      return
+    }
+
+    setUploadedFile(file)
+    setUserData('⏳ Processando arquivo...')
+
+    try {
+      let text = ''
+
+      if (file.type === 'application/pdf' || fileExtension === '.pdf') {
+        // Processar PDF
+        text = await extractTextFromPDF(file)
+      } else {
+        // Processar TXT
+        text = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader()
+          reader.onload = (event) => resolve(event.target?.result as string)
+          reader.onerror = () => reject(new Error('Erro ao ler arquivo'))
+          reader.readAsText(file, 'UTF-8')
+        })
+      }
+
+      if (text.trim().length === 0) {
+        alert('⚠️ Arquivo vazio!\n\nO arquivo não contém texto.')
+        setUploadedFile(null)
+        setUserData('')
+        e.target.value = ''
+        return
+      }
+
+      setUserData(text)
+    } catch (error) {
+      console.error('Erro ao processar arquivo:', error)
+      alert('❌ Erro ao processar arquivo.\n\nTente novamente ou cole o texto diretamente.')
+      setUploadedFile(null)
+      setUserData('')
+      e.target.value = ''
+    }
+  }
+
+  const handleCompare = async () => {
+    if (!selectedArea || !userData) {
+      alert('Selecione uma área e adicione seus dados para comparar!')
+      return
+    }
+
+    setIsComparing(true)
+    setComparisonResult(null)
+
+    try {
+      // Usa apenas as competências selecionadas para comparação
+      const skillsToCompare = Array.from(selectedSkills)
+      
+      const response = await fetch('/api/compare', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userText: userData,
+          skills: skillsToCompare,
+          area: selectedArea
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error('Erro ao comparar')
+      }
+
+      const result = await response.json()
+      setComparisonResult(result)
+    } catch (error) {
+      console.error('Erro na comparação:', error)
+      alert('Erro ao fazer a comparação. Tente novamente.')
+    } finally {
+      setIsComparing(false)
+    }
+  }
+
+  const downloadJSON = () => {
+    if (!comparisonResult || !selectedArea) return
+
+    const data = {
+      area: selectedArea,
+      porcentagem: Math.round((comparisonResult.matches / comparisonResult.total) * 100),
+      analise: comparisonResult.analysis,
+      competencias: {
+        possui: {
+          quantidade: comparisonResult.matchedSkills.length,
+          lista: comparisonResult.matchedSkills
+        },
+        desenvolver: {
+          quantidade: comparisonResult.missingSkills.length,
+          lista: comparisonResult.missingSkills
+        }
+      },
+      total: comparisonResult.total,
+      dataAnalise: new Date().toLocaleString('pt-BR')
+    }
+
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    const timestamp = new Date().toISOString().split('T')[0] // YYYY-MM-DD
+    a.download = `MentorIA-analise-${timestamp}.json`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
+  const downloadPDF = () => {
+    if (!comparisonResult || !selectedArea) return
+
+    const doc = new jsPDF()
+    const matchPercentage = Math.round((comparisonResult.matches / comparisonResult.total) * 100)
+    
+    // Header
+    doc.setFontSize(24)
+    doc.setTextColor(59, 130, 246)
+    doc.text('MentorIA', 20, 20)
+    
+    doc.setFontSize(20)
+    doc.setTextColor(0, 0, 0)
+    doc.text('Análise de Competências', 20, 35)
+    
+    // Área e Data
+    doc.setFontSize(12)
+    doc.setTextColor(100, 100, 100)
+    doc.text(`Área: ${selectedArea}`, 20, 50)
+    doc.text(`Data: ${new Date().toLocaleString('pt-BR')}`, 20, 58)
+    
+    // Match Score
+    doc.setFontSize(16)
+    doc.setTextColor(59, 130, 246)
+    doc.text(`Match: ${matchPercentage}%`, 20, 75)
+    
+    doc.setFontSize(11)
+    doc.setTextColor(0, 0, 0)
+    doc.text(`${comparisonResult.matches} de ${comparisonResult.total} competências encontradas`, 20, 83)
+    
+    // Análise
+    doc.setFontSize(10)
+    doc.setTextColor(80, 80, 80)
+    const splitAnalysis = doc.splitTextToSize(comparisonResult.analysis, 170)
+    doc.text(splitAnalysis, 20, 95)
+    
+    let yPosition = 95 + (splitAnalysis.length * 5) + 10
+    
+    // Você possui
+    doc.setFontSize(14)
+    doc.setTextColor(59, 130, 246)
+    doc.text(`Você possui (${comparisonResult.matchedSkills.length})`, 20, yPosition)
+    
+    yPosition += 8
+    doc.setFontSize(10)
+    doc.setTextColor(0, 0, 0)
+    comparisonResult.matchedSkills.forEach((skill, index) => {
+      if (yPosition > 270) {
+        doc.addPage()
+        yPosition = 20
+      }
+      doc.text(`• ${skill}`, 25, yPosition)
+      yPosition += 6
+    })
+    
+    yPosition += 5
+    
+    // Para desenvolver
+    if (yPosition > 250) {
+      doc.addPage()
+      yPosition = 20
+    }
+    
+    doc.setFontSize(14)
+    doc.setTextColor(59, 130, 246)
+    doc.text(`Para desenvolver (${comparisonResult.missingSkills.length})`, 20, yPosition)
+    
+    yPosition += 8
+    doc.setFontSize(10)
+    doc.setTextColor(0, 0, 0)
+    comparisonResult.missingSkills.forEach((skill, index) => {
+      if (yPosition > 270) {
+        doc.addPage()
+        yPosition = 20
+      }
+      doc.text(`• ${skill}`, 25, yPosition)
+      yPosition += 6
+    })
+    
+    // Footer
+    const pageCount = doc.getNumberOfPages()
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i)
+      doc.setFontSize(8)
+      doc.setTextColor(150, 150, 150)
+      doc.text(`Página ${i} de ${pageCount} - MentorIA © ${new Date().getFullYear()}`, 20, 285)
+    }
+    
+    const timestamp = new Date().toISOString().split('T')[0] // YYYY-MM-DD
+    doc.save(`MentorIA-analise-${timestamp}.pdf`)
+  }
+
+  return (
+    <div className={styles.comparisonContainer}>
+      {/* Seção 1: Seleção de Área */}
+      <div className={styles.section} style={{ zIndex: 100 }}>
+        <div className={styles.sectionHeader}>
+          <span className={styles.stepNumber}>1</span>
+          <h3 className={styles.sectionTitle}>Selecione sua Área Profissional</h3>
+        </div>
+        
+        <div className={styles.autocomplete} ref={autocompleteRef}>
+          <div className={styles.inputWrapper}>
+            <input
+              ref={inputRef}
+              type="text"
+              value={inputValue}
+              onChange={handleInputChange}
+              onKeyDown={handleKeyDown}
+              onFocus={() => inputValue && setIsOpen(true)}
+              placeholder=""
+              className={styles.input}
+              autoComplete="off"
+            />
+            <div className={styles.placeholderWrapper}>
+              <AnimatePresence mode="wait">
+                {!inputValue && (
+                  <motion.span
+                    initial={{ y: 5, opacity: 0 }}
+                    key={`placeholder-${currentPlaceholder}`}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: -15, opacity: 0 }}
+                    transition={{ duration: 0.3, ease: "linear" }}
+                    className={styles.animatedPlaceholder}
+                  >
+                    {placeholders[currentPlaceholder]}
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </div>
+            <svg 
+              className={styles.searchIcon} 
+              width="20" 
+              height="20" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor"
+              onClick={handleSearchClick}
+              style={{ cursor: 'pointer', pointerEvents: 'auto' }}
+            >
+              <circle cx="11" cy="11" r="8" strokeWidth="2" />
+              <path d="m21 21-4.35-4.35" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+          </div>
+
+          {isOpen && filteredAreas.length > 0 && (
+            <div className={styles.dropdown} ref={dropdownRef}>
+              {filteredAreas.map((area, index) => (
+                <button
+                  key={area}
+                  className={`${styles.option} ${index === selectedIndex ? styles.selected : ''}`}
+                  onClick={() => handleSelect(area)}
+                  onMouseEnter={() => setSelectedIndex(index)}
+                >
+                  {area}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {isOpen && inputValue && filteredAreas.length === 0 && (
+            <div className={styles.dropdown}>
+              <div className={styles.noResults}>
+                Nenhuma área encontrada
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Seção 2: Competências da Área */}
+      {selectedArea && (
+        <div className={styles.section} style={{ zIndex: 50 }}>
+          <div className={styles.sectionHeader}>
+            <span className={styles.stepNumber}>2</span>
+            <h3 className={styles.sectionTitle}>
+              Competências de <span className={styles.highlight}>{selectedArea}</span>
+            </h3>
+          </div>
+          
+          <p className={styles.skillsHint}>
+            Clique para desmarcar competências
+          </p>
+          
+          {loadingSkills ? (
+            <div className={styles.loading}>Carregando competências...</div>
+          ) : (
+            <div className={styles.skillsGrid}>
+              {areaSkills.map((skill, index) => (
+                <div 
+                  key={index} 
+                  className={`${styles.skillChip} ${!selectedSkills.has(skill) ? styles.deselected : ''}`}
+                  onClick={() => toggleSkill(skill)}
+                >
+                  {skill}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Seção 3: Dados do Usuário */}
+      {selectedArea && (
+        <div className={styles.section} style={{ zIndex: 25 }}>
+          <div className={styles.sectionHeader}>
+            <span className={styles.stepNumber}>3</span>
+            <h3 className={styles.sectionTitle}>Adicione seus Dados</h3>
+          </div>
+          
+          <textarea
+            ref={textareaRef}
+            className={styles.textarea}
+            placeholder="Cole seu currículo ou descreva suas experiências, projetos e tecnologias que você domina..."
+            value={userData}
+            onChange={(e) => setUserData(e.target.value)}
+          />
+
+          <div className={styles.actions}>
+            <div className={styles.fileUploadWrapper}>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".txt,.pdf"
+                onChange={handleFileUpload}
+                className={styles.fileInput}
+                id="fileUpload"
+              />
+              <label htmlFor="fileUpload" className={styles.fileUploadButton}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <polyline points="17 8 12 3 7 8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <line x1="12" y1="3" x2="12" y2="15" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+                {uploadedFile ? uploadedFile.name : 'Upload de currículo'}
+              </label>
+            </div>
+
+            <button 
+              className={styles.compareButton}
+              onClick={handleCompare}
+              disabled={!selectedArea || !userData || isComparing}
+            >
+              {isComparing ? (
+                <>
+                  <span className={styles.spinner}></span>
+                  Analisando...
+                </>
+              ) : (
+                'Analisar'
+              )}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Resultado da Comparação */}
+      {comparisonResult && (
+        <div className={styles.resultSection}>
+          <div className={styles.resultHeader}>
+            <div className={styles.resultTitleGroup}>
+              <h3>Resultado da Análise</h3>
+              <div className={styles.downloadButtons}>
+                <button 
+                  onClick={downloadJSON} 
+                  className={styles.downloadButton}
+                  title="Baixar como JSON"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <polyline points="7 10 12 15 17 10" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <line x1="12" y1="15" x2="12" y2="3" strokeWidth="2" strokeLinecap="round"/>
+                  </svg>
+                  JSON
+                </button>
+                <button 
+                  onClick={downloadPDF} 
+                  className={styles.downloadButton}
+                  title="Baixar como PDF"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <polyline points="7 10 12 15 17 10" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <line x1="12" y1="15" x2="12" y2="3" strokeWidth="2" strokeLinecap="round"/>
+                  </svg>
+                  PDF
+                </button>
+              </div>
+            </div>
+            <div 
+              className={styles.scoreCircle}
+              style={{
+                background: `hsla(${210 + (Math.round((comparisonResult.matches / comparisonResult.total) * 100) * 0.15)}, 70%, ${20 + (Math.round((comparisonResult.matches / comparisonResult.total) * 100) * 0.1)}%, 0.12)`,
+                borderColor: `hsl(${210 + (Math.round((comparisonResult.matches / comparisonResult.total) * 100) * 0.15)}, 70%, ${45 + (Math.round((comparisonResult.matches / comparisonResult.total) * 100) * 0.15)}%)`
+              }}
+            >
+              <span 
+                className={styles.scoreNumber}
+                style={{
+                  color: `hsl(${210 + (Math.round((comparisonResult.matches / comparisonResult.total) * 100) * 0.15)}, 75%, ${55 + (Math.round((comparisonResult.matches / comparisonResult.total) * 100) * 0.15)}%)`
+                }}
+              >
+                {Math.round((comparisonResult.matches / comparisonResult.total) * 100)}%
+              </span>
+              <span className={styles.scoreLabel}>Match</span>
+            </div>
+          </div>
+
+          <p className={styles.resultAnalysis}>{comparisonResult.analysis}</p>
+
+          <div className={styles.resultGrid}>
+            <div className={styles.resultColumn}>
+              <p className={styles.resultColumnTitle}>
+                Você possui ({comparisonResult.matchedSkills.length})
+              </p>
+              <div className={styles.skillsResultGrid}>
+                {comparisonResult.matchedSkills.map((skill, index) => (
+                  <div key={index} className={styles.matchedSkill}>
+                    {skill}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className={styles.resultColumn}>
+              <p className={styles.resultColumnTitle}>
+                Para desenvolver ({comparisonResult.missingSkills.length})
+              </p>
+              <div className={styles.skillsResultGrid}>
+                {comparisonResult.missingSkills.map((skill, index) => (
+                  <div key={index} className={styles.missingSkill}>
+                    {skill}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+

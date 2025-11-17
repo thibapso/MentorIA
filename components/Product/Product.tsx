@@ -2,7 +2,7 @@
 
 import styles from "./Product.module.scss";
 import Typewriter from "@/components/ui/Typewriter";
-import SkillsAutocomplete from "./SkillsAutocomplete";
+import SkillsComparison from "./SkillsComparison";
 
 interface ProductProps {
   id?: string;
@@ -13,25 +13,21 @@ export default function Product({ id }: ProductProps) {
     <section id={id} className={styles.product}>
       <div className={styles.container}>
         <Typewriter
-          text="Transforme seu Currículo"
+          text="Compare suas Competências"
           className={styles.title}
           tag="h2"
-          speed={80}
-          delay={200}
+          speed={50}
+          delay={0}
           showCursor={false}
         />
         
         <p className={styles.subtitle}>
-          Descubra as competências essenciais para sua área
+          <i>Descubra como seu perfil se alinha com as competências essenciais da sua área</i>
         </p>
 
-        <div className={styles.autocompleteWrapper}>
-          <SkillsAutocomplete />
+        <div className={styles.comparisonWrapper}>
+          <SkillsComparison />
         </div>
-
-        <p className={styles.hint}>
-          Digite para buscar entre 15 áreas profissionais disponíveis
-        </p>
       </div>
     </section>
   );
