@@ -1,7 +1,7 @@
 "use client";
 
 import createGlobe, { COBEOptions } from "cobe";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useSpring } from "react-spring";
 
 const GLOBE_CONFIG: COBEOptions = {
@@ -45,11 +45,23 @@ export default function Globe({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const pointerInteracting = useRef<number | null>(null);
   const pointerInteractionMovement = useRef(0);
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
 
   const [{ r }, api] = useSpring(() => ({
     r: 0,
     config: { mass: 1, tension: 280, friction: 40, precision: 0.001 },
   }));
+
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsSmallScreen(window.innerWidth <= 1022);
+    };
+
+    checkScreenSize();
+    window.addEventListener("resize", checkScreenSize);
+
+    return () => window.removeEventListener("resize", checkScreenSize);
+  }, []);
 
   const updatePointerInteraction = (value: number | null) => {
     pointerInteracting.current = value;
@@ -123,16 +135,18 @@ export default function Globe({
           e.touches[0] && updateMovement(e.touches[0].clientX)
         }
         style={{
-          width: "145%",
-          height: "145%",
+          width: isSmallScreen ? "120%" : "145%",
+          height: isSmallScreen ? "120%" : "145%",
           cursor: "grab",
           contain: "layout paint size",
           opacity: 0,
           transition: "opacity 1s ease",
           position: "absolute",
-          top: "55%",
-          left: "48%",
-          transform: "translate(-40%, -40%) rotate(-12deg)",
+          top: isSmallScreen ? "60%" : "55%",
+          left: isSmallScreen ? "50%" : "48%",
+          transform: isSmallScreen
+            ? "translate(-50%, -50%) rotate(0deg)"
+            : "translate(-40%, -40%) rotate(-12deg)",
           filter:
             "drop-shadow(0 8px 32px rgba(255, 255, 255, 0.04)) drop-shadow(0 0 80px rgba(255, 255, 255, 0.02))",
         }}

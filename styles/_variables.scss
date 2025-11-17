@@ -1,4 +1,6 @@
-// Cores
+// ==============================================
+// CORES
+// ==============================================
 $color-bg: #010101;
 $color-text: #e4e4e4;
 
@@ -7,13 +9,83 @@ $color-secondary: #ff4081;
 $color-accent: #00c6ff;
 $color-muted: #f5f5f5;
 
-// Tipografia
+// Cores com transparência
+$color-white-10: rgba(255, 255, 255, 0.1);
+$color-white-20: rgba(255, 255, 255, 0.2);
+$color-white-50: rgba(255, 255, 255, 0.5);
+$color-white-80: rgba(255, 255, 255, 0.8);
+$color-black-30: rgba(0, 0, 0, 0.3);
+
+// ==============================================
+// TIPOGRAFIA
+// ==============================================
 $font-title: 'Space Grotesk', sans-serif;
 $font-text: 'Plus Jakarta Sans', sans-serif;
 
-// Sombras
-$shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.05);
-$shadow-strong: 0 8px 20px rgba(0, 0, 0, 0.1);
+// Tamanhos de fonte base (responsivos)
+$font-size-xs: clamp(0.75rem, 1.2vw, 0.875rem);
+$font-size-sm: clamp(0.875rem, 1.5vw, 1rem);
+$font-size-base: clamp(1rem, 1.8vw, 1.125rem);
+$font-size-lg: clamp(1.125rem, 2vw, 1.25rem);
+$font-size-xl: clamp(1.25rem, 2.5vw, 1.5rem);
+$font-size-2xl: clamp(1.5rem, 3vw, 2rem);
+$font-size-3xl: clamp(2rem, 4vw, 3rem);
+$font-size-4xl: clamp(2.5rem, 5vw, 4rem);
 
-// Transições
+// ==============================================
+// ESPAÇAMENTO (RESPONSIVO)
+// ==============================================
+$spacing-xs: clamp(0.25rem, 0.5vw, 0.5rem);
+$spacing-sm: clamp(0.5rem, 1vw, 0.75rem);
+$spacing-md: clamp(0.75rem, 1.5vw, 1rem);
+$spacing-lg: clamp(1rem, 2vw, 1.5rem);
+$spacing-xl: clamp(1.5rem, 3vw, 2rem);
+$spacing-2xl: clamp(2rem, 4vw, 3rem);
+$spacing-3xl: clamp(3rem, 6vw, 4rem);
+
+// ==============================================
+// SOMBRAS
+// ==============================================
+$shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.05);
+$shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.08);
+$shadow-strong: 0 8px 20px rgba(0, 0, 0, 0.1);
+$shadow-glow: 0 0 20px rgba(59, 130, 246, 0.3);
+
+// ==============================================
+// TRANSIÇÕES
+// ==============================================
+$transition-fast: all 0.2s ease;
 $transition-default: all 0.3s ease;
+$transition-slow: all 0.5s ease;
+$transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+// ==============================================
+// BORDER RADIUS (RESPONSIVO)
+// ==============================================
+$radius-sm: clamp(0.25rem, 0.5vw, 0.375rem);
+$radius-md: clamp(0.5rem, 1vw, 0.75rem);
+$radius-lg: clamp(0.75rem, 1.5vw, 1rem);
+$radius-xl: clamp(1rem, 2vw, 1.5rem);
+$radius-full: 9999px;
+
+// ==============================================
+// Z-INDEX HIERARCHY
+// ==============================================
+$z-negative: -1;
+$z-base: 1;
+$z-dropdown: 100;
+$z-sticky: 200;
+$z-fixed: 500;
+$z-modal-backdrop: 900;
+$z-modal: 1000;
+$z-popover: 1100;
+$z-tooltip: 1200;
+
+// ==============================================
+// CONTAINER SIZES
+// ==============================================
+$container-sm: 640px;
+$container-md: 768px;
+$container-lg: 1024px;
+$container-xl: 1280px;
+$container-2xl: 1536px;

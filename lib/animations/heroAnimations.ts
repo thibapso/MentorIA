@@ -3,7 +3,7 @@ import { gsap } from 'gsap'
 export function cycleWords(wordElement: HTMLElement | null) {
   if (!wordElement) return
 
-  const words = ['direção.', 'clareza.', 'uma chance.', 'MentorIA.']
+  const words = ['direção.', 'clareza.', 'suporte.', 'MentorIA.']
   const tl = gsap.timeline({ repeat: -1, repeatDelay: 0.4 }) 
 
   words.forEach((word, i) => {

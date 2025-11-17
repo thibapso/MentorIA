@@ -1,6 +1,6 @@
 .typewriterCursor {
   display: inline-block;
-  margin-left: 4px;
+  margin-left: clamp(3px, 0.5vw, 4px);
   animation: blink 1s infinite;
   font-weight: 300;
   opacity: 1;

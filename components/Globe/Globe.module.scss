@@ -1,4 +1,5 @@
 @import '@/styles/variables';
+@use '@/styles/mixins' as m;
 
 .globe {
   width: 100%;
@@ -8,13 +9,30 @@
   justify-content: center;
   position: relative;
   overflow: hidden;
-  border-radius: 1rem;
+  border-radius: clamp(0.75rem, 1.5vw, 1rem);
   background: rgba($color-bg, 0.5);
   backdrop-filter: blur(10px);
+  min-height: 300px;
 
   canvas {
     width: 100% !important;
     height: 100% !important;
+    max-width: 100%;
+    max-height: 100%;
+  }
+  
+  @media (max-width: 1023px) {
+    border-radius: 0.75rem;
+  }
+  
+  @include m.respond-below('md') {
+    border-radius: 0.75rem;
+    min-height: 250px;
+  }
+  
+  @include m.respond-below('sm') {
+    min-height: 200px;
+    border-radius: 0.625rem;
   }
 }
 

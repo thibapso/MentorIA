@@ -24,7 +24,7 @@
 
 .split-word {
   white-space: nowrap;
-  margin-right: 0.25em;
+  margin-right: clamp(0.2em, 0.4vw, 0.25em);
 }
 
 .split-char {

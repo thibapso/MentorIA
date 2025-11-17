@@ -96,12 +96,36 @@
   padding-left: 1.5rem;
   pointer-events: none;
   z-index: 1;
+  
+  @media (max-width: 768px) {
+    padding-left: 1.25rem;
+  }
+  
+  @media (max-width: 480px) {
+    padding-left: 1.125rem;
+  }
+  
+  @media (max-width: 375px) {
+    padding-left: 1rem;
+  }
 }
 
 .animatedPlaceholder {
   color: rgba(255, 255, 255, 0.5);
   font-size: 1.125rem;
   font-weight: 500;
+  
+  @media (max-width: 768px) {
+    font-size: 1rem;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 0.938rem;
+  }
+  
+  @media (max-width: 375px) {
+    font-size: 0.875rem;
+  }
 }
 
 .input {
@@ -130,6 +154,21 @@
 
   &:hover:not(:focus) {
     border-color: rgba(255, 255, 255, 0.25);
+  }
+  
+  @media (max-width: 768px) {
+    font-size: 1rem;
+    padding: 1.125rem 3.25rem 1.125rem 1.25rem;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 0.938rem;
+    padding: 1rem 3rem 1rem 1.125rem;
+  }
+  
+  @media (max-width: 375px) {
+    font-size: 0.875rem;
+    padding: 0.938rem 2.75rem 0.938rem 1rem;
   }
 }
 
@@ -320,6 +359,21 @@
 
   &:hover:not(:focus) {
     border-color: rgba(255, 255, 255, 0.2);
+  }
+  
+  @media (max-width: 768px) {
+    font-size: 0.938rem;
+    padding: 1.125rem;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 0.875rem;
+    padding: 1rem;
+  }
+  
+  @media (max-width: 375px) {
+    font-size: 0.813rem;
+    padding: 0.938rem;
   }
 
   &::-webkit-scrollbar {

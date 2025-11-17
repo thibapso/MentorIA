@@ -233,7 +233,7 @@ export default function Benefits({ id }: BenefitsProps) {
                     icon: "/business/2.png",
                   },
                 ]}
-                stackGap={20}
+                stackGap={30}
                 columnGap={85}
                 scaleFactor={0.05}
                 scrollDownDuration={5}

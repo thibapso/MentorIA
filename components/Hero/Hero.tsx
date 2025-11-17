@@ -28,9 +28,13 @@ export default function Hero({ id }: HeroProps) {
         <span className={styles.name}>MentorIA</span>
 
         <h1 className={styles.title}>
-          Às vezes, o que falta não é talento. É{' '}
-          <span ref={wordRef} className={styles.word}>
-            direção.
+          Às vezes, o que falta
+          <br />
+          <span className={styles.noBreak}>
+            não é talento. É{' '}
+            <span ref={wordRef} className={styles.word}>
+              direção.
+            </span>
           </span>
         </h1>
 

@@ -7,6 +7,12 @@ export const metadata: Metadata = {
   title: "MentorIA",
   description:
     "Com a MentorIA, você nunca estará sozinho em sua jornada de aprendizado.",
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 5,
+    userScalable: true,
+  },
 };
 
 export default function RootLayout({
