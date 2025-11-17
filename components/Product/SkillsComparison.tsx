@@ -76,6 +76,7 @@ export default function SkillsComparison() {
       }
       document.removeEventListener("visibilitychange", handleVisibilityChange)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
@@ -97,7 +98,7 @@ export default function SkillsComparison() {
     const handleWheel = (e: WheelEvent) => {
       e.stopPropagation()
       e.preventDefault()
-      
+
       dropdown.scrollTop += e.deltaY
     }
 
@@ -112,11 +113,11 @@ export default function SkillsComparison() {
     const handleWheel = (e: WheelEvent) => {
       const target = e.currentTarget as HTMLTextAreaElement
       const isScrollable = target.scrollHeight > target.clientHeight
-      
+
       if (isScrollable) {
         e.stopPropagation()
         e.preventDefault()
-        
+
         target.scrollTop += e.deltaY
       }
     }
@@ -150,7 +151,7 @@ export default function SkillsComparison() {
     setSelectedIndex(-1)
     setSelectedArea(area)
     setLoadingSkills(true)
-    
+
     try {
       const skills = await getAllSkills({ area })
       if (skills.length > 0) {
@@ -184,7 +185,7 @@ export default function SkillsComparison() {
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault()
-        setSelectedIndex(prev => 
+        setSelectedIndex(prev =>
           prev < filteredAreas.length - 1 ? prev + 1 : prev
         )
         break
@@ -209,10 +210,10 @@ export default function SkillsComparison() {
     try {
       // Import dinâmico do PDF.js apenas no cliente
       const pdfjsLib = await import('pdfjs-dist')
-      
+
       // Configurar worker
       pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs'
-      
+
       const arrayBuffer = await file.arrayBuffer()
       const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise
       let fullText = ''
@@ -221,7 +222,7 @@ export default function SkillsComparison() {
         const page = await pdf.getPage(i)
         const textContent = await page.getTextContent()
         const pageText = textContent.items
-          .map((item: any) => item.str)
+          .map((item) => ('str' in item ? item.str : ''))
           .join(' ')
         fullText += pageText + '\n'
       }
@@ -241,7 +242,7 @@ export default function SkillsComparison() {
     const validTypes = ['text/plain', 'application/pdf']
     const validExtensions = ['.txt', '.pdf']
     const fileExtension = file.name.toLowerCase().slice(file.name.lastIndexOf('.'))
-    
+
     if (!validTypes.includes(file.type) && !validExtensions.includes(fileExtension)) {
       alert('⚠️ Por favor, faça upload apenas de arquivos .txt ou .pdf\n\nPara arquivos DOC/DOCX, copie o conteúdo e cole no campo de texto.')
       e.target.value = ''
@@ -258,7 +259,7 @@ export default function SkillsComparison() {
     }
 
     setUploadedFile(file)
-    setUserData('⏳ Processando arquivo...')
+    setUserData('Processando arquivo...')
 
     try {
       let text = ''
@@ -306,7 +307,7 @@ export default function SkillsComparison() {
     try {
       // Usa apenas as competências selecionadas para comparação
       const skillsToCompare = Array.from(selectedSkills)
-      
+
       const response = await fetch('/api/compare', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -369,48 +370,48 @@ export default function SkillsComparison() {
 
     const doc = new jsPDF()
     const matchPercentage = Math.round((comparisonResult.matches / comparisonResult.total) * 100)
-    
+
     // Header
     doc.setFontSize(24)
     doc.setTextColor(59, 130, 246)
     doc.text('MentorIA', 20, 20)
-    
+
     doc.setFontSize(20)
     doc.setTextColor(0, 0, 0)
     doc.text('Análise de Competências', 20, 35)
-    
+
     // Área e Data
     doc.setFontSize(12)
     doc.setTextColor(100, 100, 100)
     doc.text(`Área: ${selectedArea}`, 20, 50)
     doc.text(`Data: ${new Date().toLocaleString('pt-BR')}`, 20, 58)
-    
+
     // Match Score
     doc.setFontSize(16)
     doc.setTextColor(59, 130, 246)
     doc.text(`Match: ${matchPercentage}%`, 20, 75)
-    
+
     doc.setFontSize(11)
     doc.setTextColor(0, 0, 0)
     doc.text(`${comparisonResult.matches} de ${comparisonResult.total} competências encontradas`, 20, 83)
-    
+
     // Análise
     doc.setFontSize(10)
     doc.setTextColor(80, 80, 80)
     const splitAnalysis = doc.splitTextToSize(comparisonResult.analysis, 170)
     doc.text(splitAnalysis, 20, 95)
-    
+
     let yPosition = 95 + (splitAnalysis.length * 5) + 10
-    
+
     // Você possui
     doc.setFontSize(14)
     doc.setTextColor(59, 130, 246)
     doc.text(`Você possui (${comparisonResult.matchedSkills.length})`, 20, yPosition)
-    
+
     yPosition += 8
     doc.setFontSize(10)
     doc.setTextColor(0, 0, 0)
-    comparisonResult.matchedSkills.forEach((skill, index) => {
+    comparisonResult.matchedSkills.forEach((skill) => {
       if (yPosition > 270) {
         doc.addPage()
         yPosition = 20
@@ -418,23 +419,23 @@ export default function SkillsComparison() {
       doc.text(`• ${skill}`, 25, yPosition)
       yPosition += 6
     })
-    
+
     yPosition += 5
-    
+
     // Para desenvolver
     if (yPosition > 250) {
       doc.addPage()
       yPosition = 20
     }
-    
+
     doc.setFontSize(14)
     doc.setTextColor(59, 130, 246)
     doc.text(`Para desenvolver (${comparisonResult.missingSkills.length})`, 20, yPosition)
-    
+
     yPosition += 8
     doc.setFontSize(10)
     doc.setTextColor(0, 0, 0)
-    comparisonResult.missingSkills.forEach((skill, index) => {
+    comparisonResult.missingSkills.forEach((skill) => {
       if (yPosition > 270) {
         doc.addPage()
         yPosition = 20
@@ -442,7 +443,7 @@ export default function SkillsComparison() {
       doc.text(`• ${skill}`, 25, yPosition)
       yPosition += 6
     })
-    
+
     // Footer
     const pageCount = doc.getNumberOfPages()
     for (let i = 1; i <= pageCount; i++) {
@@ -451,7 +452,7 @@ export default function SkillsComparison() {
       doc.setTextColor(150, 150, 150)
       doc.text(`Página ${i} de ${pageCount} - MentorIA © ${new Date().getFullYear()}`, 20, 285)
     }
-    
+
     const timestamp = new Date().toISOString().split('T')[0] // YYYY-MM-DD
     doc.save(`MentorIA-analise-${timestamp}.pdf`)
   }
@@ -464,7 +465,7 @@ export default function SkillsComparison() {
           <span className={styles.stepNumber}>1</span>
           <h3 className={styles.sectionTitle}>Selecione sua Área Profissional</h3>
         </div>
-        
+
         <div className={styles.autocomplete} ref={autocompleteRef}>
           <div className={styles.inputWrapper}>
             <input
@@ -494,12 +495,12 @@ export default function SkillsComparison() {
                 )}
               </AnimatePresence>
             </div>
-            <svg 
-              className={styles.searchIcon} 
-              width="20" 
-              height="20" 
-              viewBox="0 0 24 24" 
-              fill="none" 
+            <svg
+              className={styles.searchIcon}
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
               stroke="currentColor"
               onClick={handleSearchClick}
               style={{ cursor: 'pointer', pointerEvents: 'auto' }}
@@ -543,18 +544,18 @@ export default function SkillsComparison() {
               Competências de <span className={styles.highlight}>{selectedArea}</span>
             </h3>
           </div>
-          
+
           <p className={styles.skillsHint}>
             Clique para desmarcar competências
           </p>
-          
+
           {loadingSkills ? (
             <div className={styles.loading}>Carregando competências...</div>
           ) : (
             <div className={styles.skillsGrid}>
               {areaSkills.map((skill, index) => (
-                <div 
-                  key={index} 
+                <div
+                  key={index}
                   className={`${styles.skillChip} ${!selectedSkills.has(skill) ? styles.deselected : ''}`}
                   onClick={() => toggleSkill(skill)}
                 >
@@ -573,7 +574,7 @@ export default function SkillsComparison() {
             <span className={styles.stepNumber}>3</span>
             <h3 className={styles.sectionTitle}>Adicione seus Dados</h3>
           </div>
-          
+
           <textarea
             ref={textareaRef}
             className={styles.textarea}
@@ -594,15 +595,15 @@ export default function SkillsComparison() {
               />
               <label htmlFor="fileUpload" className={styles.fileUploadButton}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  <polyline points="17 8 12 3 7 8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  <line x1="12" y1="3" x2="12" y2="15" strokeWidth="2" strokeLinecap="round"/>
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <polyline points="17 8 12 3 7 8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <line x1="12" y1="3" x2="12" y2="15" strokeWidth="2" strokeLinecap="round" />
                 </svg>
                 {uploadedFile ? uploadedFile.name : 'Upload de currículo'}
               </label>
             </div>
 
-            <button 
+            <button
               className={styles.compareButton}
               onClick={handleCompare}
               disabled={!selectedArea || !userData || isComparing}
@@ -627,40 +628,40 @@ export default function SkillsComparison() {
             <div className={styles.resultTitleGroup}>
               <h3>Resultado da Análise</h3>
               <div className={styles.downloadButtons}>
-                <button 
-                  onClick={downloadJSON} 
+                <button
+                  onClick={downloadJSON}
                   className={styles.downloadButton}
                   title="Baixar como JSON"
                 >
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <polyline points="7 10 12 15 17 10" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <line x1="12" y1="15" x2="12" y2="3" strokeWidth="2" strokeLinecap="round"/>
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    <polyline points="7 10 12 15 17 10" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    <line x1="12" y1="15" x2="12" y2="3" strokeWidth="2" strokeLinecap="round" />
                   </svg>
                   JSON
                 </button>
-                <button 
-                  onClick={downloadPDF} 
+                <button
+                  onClick={downloadPDF}
                   className={styles.downloadButton}
                   title="Baixar como PDF"
                 >
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <polyline points="7 10 12 15 17 10" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <line x1="12" y1="15" x2="12" y2="3" strokeWidth="2" strokeLinecap="round"/>
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    <polyline points="7 10 12 15 17 10" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    <line x1="12" y1="15" x2="12" y2="3" strokeWidth="2" strokeLinecap="round" />
                   </svg>
                   PDF
                 </button>
               </div>
             </div>
-            <div 
+            <div
               className={styles.scoreCircle}
               style={{
                 background: `hsla(${210 + (Math.round((comparisonResult.matches / comparisonResult.total) * 100) * 0.15)}, 70%, ${20 + (Math.round((comparisonResult.matches / comparisonResult.total) * 100) * 0.1)}%, 0.12)`,
                 borderColor: `hsl(${210 + (Math.round((comparisonResult.matches / comparisonResult.total) * 100) * 0.15)}, 70%, ${45 + (Math.round((comparisonResult.matches / comparisonResult.total) * 100) * 0.15)}%)`
               }}
             >
-              <span 
+              <span
                 className={styles.scoreNumber}
                 style={{
                   color: `hsl(${210 + (Math.round((comparisonResult.matches / comparisonResult.total) * 100) * 0.15)}, 75%, ${55 + (Math.round((comparisonResult.matches / comparisonResult.total) * 100) * 0.15)}%)`
