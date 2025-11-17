@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { getAreas, getAllSkills } from '@/lib/api-client'
 import styles from './SkillsComparison.module.scss'
+import { AnimatePresence, motion } from 'framer-motion'
 
 interface ComparisonResult {
   matches: number
@@ -19,6 +20,7 @@ export default function SkillsComparison() {
   const [isOpen, setIsOpen] = useState(false)
   const [selectedIndex, setSelectedIndex] = useState(-1)
   const [selectedArea, setSelectedArea] = useState<string | null>(null)
+  const [currentPlaceholder, setCurrentPlaceholder] = useState(0)
   const [areaSkills, setAreaSkills] = useState<string[]>([])
   const [selectedSkills, setSelectedSkills] = useState<Set<string>>(new Set())
   const [loadingSkills, setLoadingSkills] = useState(false)
@@ -31,10 +33,48 @@ export default function SkillsComparison() {
   const autocompleteRef = useRef<HTMLDivElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const intervalRef = useRef<NodeJS.Timeout | null>(null)
+
+  const placeholders = [
+    "Ex: Desenvolvimento Front-End",
+    "Ex: Data Science",
+    "Ex: Desenvolvimento Back-End",
+    "Ex: DevOps",
+    "Ex: UX/UI Design",
+    "Ex: Análise de Dados",
+  ]
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     getAreas().then(setAreas).catch(console.error)
+  }, [])
+
+  // Animated placeholders
+  useEffect(() => {
+    const startAnimation = () => {
+      intervalRef.current = setInterval(() => {
+        setCurrentPlaceholder((prev) => (prev + 1) % placeholders.length)
+      }, 3000)
+    }
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState !== "visible" && intervalRef.current) {
+        clearInterval(intervalRef.current)
+        intervalRef.current = null
+      } else if (document.visibilityState === "visible") {
+        startAnimation()
+      }
+    }
+
+    startAnimation()
+    document.addEventListener("visibilitychange", handleVisibilityChange)
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+      }
+      document.removeEventListener("visibilitychange", handleVisibilityChange)
+    }
   }, [])
 
   useEffect(() => {
@@ -233,10 +273,26 @@ export default function SkillsComparison() {
               onChange={handleInputChange}
               onKeyDown={handleKeyDown}
               onFocus={() => inputValue && setIsOpen(true)}
-              placeholder="Ex: Desenvolvimento Front-End, Data Science..."
+              placeholder=""
               className={styles.input}
               autoComplete="off"
             />
+            <div className={styles.placeholderWrapper}>
+              <AnimatePresence mode="wait">
+                {!inputValue && (
+                  <motion.span
+                    initial={{ y: 5, opacity: 0 }}
+                    key={`placeholder-${currentPlaceholder}`}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: -15, opacity: 0 }}
+                    transition={{ duration: 0.3, ease: "linear" }}
+                    className={styles.animatedPlaceholder}
+                  >
+                    {placeholders[currentPlaceholder]}
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </div>
             <svg 
               className={styles.searchIcon} 
               width="20" 
