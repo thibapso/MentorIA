@@ -33,7 +33,36 @@ export default function BounceCards({
 }: BounceCardsProps) {
   const animatedRef = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [isVisible, setIsVisible] = useState(false);
+  const [canHover, setCanHover] = useState(false);
+
+  useEffect(() => {
+    cardRefs.current = cardRefs.current.slice(0, images.length);
+  }, [images.length]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const validCards = cardRefs.current.filter(Boolean);
+      if (validCards.length === 0) return;
+
+      validCards.forEach((card, idx) => {
+        if (card) {
+          gsap.set(card, {
+            transform: transformStyles[idx] ?? "none",
+            clearProps: "transition",
+          });
+
+          gsap.to(card, {
+            transform: transformStyles[idx] ?? "none",
+            duration: 0,
+          });
+        }
+      });
+    }, 0);
+
+    return () => clearTimeout(timer);
+  }, [transformStyles]);
 
   useEffect(() => {
     const currentContainer = containerRef.current;
@@ -67,17 +96,39 @@ export default function BounceCards({
   useEffect(() => {
     if (!isVisible) return;
 
+    const validCards = cardRefs.current.filter(Boolean);
+    if (validCards.length === 0) return;
+
+    setCanHover(false);
+
+    const totalDuration = animationDelay + 1 + (validCards.length * animationStagger);
+
     gsap.fromTo(
-      ".card",
+      validCards,
       { scale: 0 },
       {
         scale: 1,
         stagger: animationStagger,
         ease: easeType,
         delay: animationDelay,
+        duration: 1,
+        onComplete: () => {
+          validCards.forEach((card, idx) => {
+            if (card) {
+              const baseTransform = transformStyles[idx] || "none";
+              gsap.set(card, { transform: baseTransform });
+            }
+          });
+        },
       }
     );
-  }, [isVisible, animationStagger, easeType, animationDelay]);
+
+    const timer = setTimeout(() => {
+      setCanHover(true);
+    }, totalDuration * 1000);
+
+    return () => clearTimeout(timer);
+  }, [isVisible, animationStagger, easeType, animationDelay, enableHover, transformStyles]);
 
   const getNoRotationTransform = useCallback((transformStr: string): string => {
     const hasRotate = /rotate\([\s\S]*?\)/.test(transformStr);
@@ -109,19 +160,25 @@ export default function BounceCards({
 
   const pushSiblings = useCallback(
     (hoveredIdx: number) => {
-      if (!enableHover) return;
+      if (!enableHover || !canHover) return;
 
       images.forEach((_, i) => {
-        gsap.killTweensOf(`.card-${i}`);
+        const card = cardRefs.current[i];
+        if (!card) return;
+
+        void card.offsetHeight;
+
+        gsap.killTweensOf(card);
         const baseTransform = transformStyles[i] || "none";
 
         if (i === hoveredIdx) {
           const noRotation = getNoRotationTransform(baseTransform);
-          gsap.to(`.card-${i}`, {
+          gsap.to(card, {
             transform: noRotation,
             duration: 0.3,
             ease: "power2.out",
-            overwrite: "auto",
+            overwrite: true,
+            force3D: true,
           });
         } else {
           const offsetX = i < hoveredIdx ? -120 : 120;
@@ -129,18 +186,20 @@ export default function BounceCards({
           const distance = Math.abs(hoveredIdx - i);
           const delay = distance * 0.03;
 
-          gsap.to(`.card-${i}`, {
+          gsap.to(card, {
             transform: pushedTransform,
             duration: 0.3,
             ease: "power2.out",
             delay,
-            overwrite: "auto",
+            overwrite: true,
+            force3D: true,
           });
         }
       });
     },
     [
       enableHover,
+      canHover,
       images,
       transformStyles,
       getNoRotationTransform,
@@ -149,19 +208,25 @@ export default function BounceCards({
   );
 
   const resetSiblings = useCallback(() => {
-    if (!enableHover) return;
+    if (!enableHover || !canHover) return;
 
     images.forEach((_, i) => {
-      gsap.killTweensOf(`.card-${i}`);
+      const card = cardRefs.current[i];
+      if (!card) return;
+
+      void card.offsetHeight;
+
+      gsap.killTweensOf(card);
       const baseTransform = transformStyles[i] || "none";
-      gsap.to(`.card-${i}`, {
+      gsap.to(card, {
         transform: baseTransform,
         duration: 0.3,
         ease: "power2.out",
-        overwrite: "auto",
+        overwrite: true,
+        force3D: true,
       });
     });
-  }, [enableHover, images, transformStyles]);
+  }, [enableHover, canHover, images, transformStyles]);
 
   return (
     <div
@@ -176,8 +241,10 @@ export default function BounceCards({
       {images.map((src, idx) => (
         <div
           key={idx}
-          className={`card card-${idx} ${styles.card}`}
-          style={{ transform: transformStyles[idx] ?? "none" }}
+          ref={(el) => {
+            cardRefs.current[idx] = el;
+          }}
+          className={styles.card}
           onMouseEnter={() => pushSiblings(idx)}
           onMouseLeave={resetSiblings}
         >

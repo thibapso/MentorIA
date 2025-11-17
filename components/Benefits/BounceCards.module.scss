@@ -38,8 +38,10 @@
   overflow: hidden;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   cursor: pointer;
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  transition: box-shadow 0.3s ease;
   will-change: transform;
+  pointer-events: auto;
+  user-select: none;
 
   &:hover {
     box-shadow: 0 8px 30px rgba(255, 255, 255, 0.1);
