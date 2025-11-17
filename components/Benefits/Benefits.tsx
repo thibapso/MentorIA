@@ -149,7 +149,7 @@ export default function Benefits({ id }: BenefitsProps) {
                 ]}
                 containerWidth={450}
                 containerHeight={450}
-                animationDelay={1}
+                animationDelay={0.2}
                 animationStagger={0.1}
                 easeType="elastic.out(1, 0.5)"
                 transformStyles={[

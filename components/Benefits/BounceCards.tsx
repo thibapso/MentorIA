@@ -48,8 +48,8 @@ export default function BounceCards({
         });
       },
       {
-        threshold: 0.2,
-        rootMargin: "0px",
+        threshold: 0.1,
+        rootMargin: "50px",
       }
     );
 
