@@ -5,12 +5,6 @@ import { getAreas, getAllSkills } from '@/lib/api-client'
 import styles from './SkillsComparison.module.scss'
 import { AnimatePresence, motion } from 'framer-motion'
 import jsPDF from 'jspdf'
-import * as pdfjsLib from 'pdfjs-dist'
-
-// Configurar worker do PDF.js
-if (typeof window !== 'undefined') {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs'
-}
 
 interface ComparisonResult {
   matches: number
@@ -213,6 +207,12 @@ export default function SkillsComparison() {
 
   const extractTextFromPDF = async (file: File): Promise<string> => {
     try {
+      // Import dinâmico do PDF.js apenas no cliente
+      const pdfjsLib = await import('pdfjs-dist')
+      
+      // Configurar worker
+      pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs'
+      
       const arrayBuffer = await file.arrayBuffer()
       const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise
       let fullText = ''
