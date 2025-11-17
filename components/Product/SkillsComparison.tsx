@@ -368,8 +368,19 @@ export default function SkillsComparison() {
         <div className={styles.resultSection}>
           <div className={styles.resultHeader}>
             <h3>Resultado da Análise</h3>
-            <div className={styles.scoreCircle}>
-              <span className={styles.scoreNumber}>
+            <div 
+              className={styles.scoreCircle}
+              style={{
+                background: `hsla(${210 + (Math.round((comparisonResult.matches / comparisonResult.total) * 100) * 0.15)}, 70%, ${20 + (Math.round((comparisonResult.matches / comparisonResult.total) * 100) * 0.1)}%, 0.12)`,
+                borderColor: `hsl(${210 + (Math.round((comparisonResult.matches / comparisonResult.total) * 100) * 0.15)}, 70%, ${45 + (Math.round((comparisonResult.matches / comparisonResult.total) * 100) * 0.15)}%)`
+              }}
+            >
+              <span 
+                className={styles.scoreNumber}
+                style={{
+                  color: `hsl(${210 + (Math.round((comparisonResult.matches / comparisonResult.total) * 100) * 0.15)}, 75%, ${55 + (Math.round((comparisonResult.matches / comparisonResult.total) * 100) * 0.15)}%)`
+                }}
+              >
                 {Math.round((comparisonResult.matches / comparisonResult.total) * 100)}%
               </span>
               <span className={styles.scoreLabel}>Match</span>
@@ -380,29 +391,29 @@ export default function SkillsComparison() {
 
           <div className={styles.resultGrid}>
             <div className={styles.resultColumn}>
-              <h4 className={styles.resultColumnTitle}>
-                ✓ Você possui ({comparisonResult.matchedSkills.length})
-              </h4>
-              <ul className={styles.resultList}>
+              <p className={styles.resultColumnTitle}>
+                Você possui ({comparisonResult.matchedSkills.length})
+              </p>
+              <div className={styles.skillsResultGrid}>
                 {comparisonResult.matchedSkills.map((skill, index) => (
-                  <li key={index} className={styles.matchedSkill}>
+                  <div key={index} className={styles.matchedSkill}>
                     {skill}
-                  </li>
+                  </div>
                 ))}
-              </ul>
+              </div>
             </div>
 
             <div className={styles.resultColumn}>
-              <h4 className={styles.resultColumnTitle}>
-                → Para desenvolver ({comparisonResult.missingSkills.length})
-              </h4>
-              <ul className={styles.resultList}>
+              <p className={styles.resultColumnTitle}>
+                Para desenvolver ({comparisonResult.missingSkills.length})
+              </p>
+              <div className={styles.skillsResultGrid}>
                 {comparisonResult.missingSkills.map((skill, index) => (
-                  <li key={index} className={styles.missingSkill}>
+                  <div key={index} className={styles.missingSkill}>
                     {skill}
-                  </li>
+                  </div>
                 ))}
-              </ul>
+              </div>
             </div>
           </div>
         </div>

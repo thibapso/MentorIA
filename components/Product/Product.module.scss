@@ -5,18 +5,63 @@
   padding: 10rem 2rem 16rem 2rem;
   box-sizing: border-box;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   min-height: 400px;
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 1;
+
+  // Brilhos decorativos nas laterais
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(130px);
+    opacity: 0.3;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  &::before {
+    width: 900px;
+    height: 900px;
+    background: radial-gradient(
+      circle,
+      rgba(59, 130, 246, 0.5) 0%,
+      rgba(96, 165, 250, 0.32) 30%,
+      rgba(59, 130, 246, 0.2) 55%,
+      rgba(147, 197, 253, 0.1) 75%,
+      rgba(59, 130, 246, 0.04) 90%,
+      transparent 100%
+    );
+    top: 6%;
+    left: -14%;
+  }
+
+  &::after {
+    width: 850px;
+    height: 1000px;
+    background: radial-gradient(
+      ellipse,
+      rgba(96, 165, 250, 0.45) 0%,
+      rgba(59, 130, 246, 0.28) 35%,
+      rgba(147, 197, 253, 0.16) 60%,
+      rgba(96, 165, 250, 0.08) 80%,
+      rgba(59, 130, 246, 0.03) 92%,
+      transparent 100%
+    );
+    top: 20%;
+    right: -15%;
+  }
 }
 
 .container {
   max-width: 1400px;
   margin: 0 auto;
   position: relative;
-  z-index: 1;
+  z-index: 10;
 }
 
 .title {
@@ -34,7 +79,7 @@
   font-family: v.$font-title;
   line-height: 1.1;
   position: relative;
-  z-index: 1;
+  z-index: 11;
 }
 
 .subtitle {
@@ -47,7 +92,7 @@
   line-height: 1.6;
   font-style: italic;
   position: relative;
-  z-index: 1;
+  z-index: 11;
 }
 
 .comparisonWrapper {
@@ -59,6 +104,24 @@
   .product {
     padding: 5rem 1.5rem;
     min-height: 300px;
+    overflow: visible;
+
+    &::before,
+    &::after {
+      filter: blur(110px);
+      opacity: 0.2;
+      position: absolute;
+    }
+
+    &::before {
+      width: 550px;
+      height: 550px;
+    }
+
+    &::after {
+      width: 500px;
+      height: 600px;
+    }
   }
 
   .title {

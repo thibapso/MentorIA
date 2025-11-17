@@ -9,6 +9,8 @@
   max-width: 900px;
   min-width: 900px;
   margin: 0 auto;
+  position: relative;
+  z-index: 10;
 }
 
 @media (max-width: 968px) {
@@ -405,7 +407,7 @@
   margin-top: 1rem;
   padding: 2rem;
   background: rgba(255, 255, 255, 0.03);
-  border: 2px solid rgba(99, 102, 241, 0.2);
+  border: 1px solid rgba(59, 130, 246, 0.3);
   border-radius: 20px;
   animation: fadeInUp 0.5s ease-out;
 }
@@ -432,18 +434,18 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 90px;
-  height: 90px;
-  background: rgba(99, 102, 241, 0.15);
-  border: 3px solid var(--accent-color);
+  width: 100px;
+  height: 100px;
+  border: 2px solid;
   border-radius: 50%;
+  // Background e borderColor definidos dinamicamente no componente
 }
 
 .scoreNumber {
-  font-size: 1.75rem;
-  font-weight: 800;
-  color: var(--accent-color);
+  font-size: 1.5rem;
+  font-weight: 700;
   line-height: 1;
+  // Cor definida dinamicamente no componente baseada na porcentagem
 }
 
 .scoreLabel {
@@ -482,9 +484,10 @@
 
 .resultColumnTitle {
   margin: 0 0 1rem 0;
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.9);
+  font-size: 1rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.8);
+  font-family: $font-text;
 }
 
 .resultList {
@@ -496,24 +499,41 @@
   gap: 0.625rem;
 }
 
+.skillsResultGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.625rem;
+}
+
 .matchedSkill,
 .missingSkill {
   padding: 0.75rem 1rem;
   border-radius: 10px;
   font-size: 0.938rem;
   line-height: 1.4;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.85);
+  transition: all 0.2s ease;
+  cursor: default;
+
+  &:hover {
+    background: rgba(59, 130, 246, 0.06);
+    border-color: rgba(59, 130, 246, 0.2);
+    color: rgba(255, 255, 255, 0.92);
+  }
 }
 
 .matchedSkill {
-  background: rgba(34, 197, 94, 0.1);
-  border-left: 3px solid #22c55e;
-  color: rgba(255, 255, 255, 0.9);
+  // Mantém os mesmos estilos base
 }
 
 .missingSkill {
-  background: rgba(255, 255, 255, 0.04);
-  border-left: 3px solid rgba(255, 255, 255, 0.2);
-  color: rgba(255, 255, 255, 0.7);
+  opacity: 0.7;
+
+  &:hover {
+    opacity: 1;
+  }
 }
 
 // ============= ANIMAÇÕES =============
@@ -609,12 +629,16 @@
     gap: 1.5rem;
   }
 
+  .skillsResultGrid {
+    grid-template-columns: 1fr;
+  }
+
   .scoreCircle {
-    width: 80px;
-    height: 80px;
+    width: 90px;
+    height: 90px;
   }
 
   .scoreNumber {
-    font-size: 1.5rem;
+    font-size: 1.35rem;
   }
 }
