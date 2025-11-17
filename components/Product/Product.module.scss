@@ -108,19 +108,23 @@
 
     &::before,
     &::after {
-      filter: blur(110px);
-      opacity: 0.2;
+      filter: blur(100px);
+      opacity: 0.15;
       position: absolute;
     }
 
     &::before {
-      width: 550px;
-      height: 550px;
+      width: 280px;
+      height: 280px;
+      top: 8%;
+      left: -50%;
     }
 
     &::after {
-      width: 500px;
-      height: 600px;
+      width: 260px;
+      height: 320px;
+      top: 22%;
+      right: -50%;
     }
   }
 
