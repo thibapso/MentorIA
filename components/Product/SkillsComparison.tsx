@@ -5,6 +5,12 @@ import { getAreas, getAllSkills } from '@/lib/api-client'
 import styles from './SkillsComparison.module.scss'
 import { AnimatePresence, motion } from 'framer-motion'
 import jsPDF from 'jspdf'
+import * as pdfjsLib from 'pdfjs-dist'
+
+// Configurar worker do PDF.js
+if (typeof window !== 'undefined') {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs'
+}
 
 interface ComparisonResult {
   matches: number
@@ -205,17 +211,86 @@ export default function SkillsComparison() {
     }
   }
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      setUploadedFile(file)
-      // Aqui você pode implementar a leitura do arquivo
-      const reader = new FileReader()
-      reader.onload = (event) => {
-        const text = event.target?.result as string
-        setUserData(text)
+  const extractTextFromPDF = async (file: File): Promise<string> => {
+    try {
+      const arrayBuffer = await file.arrayBuffer()
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise
+      let fullText = ''
+
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i)
+        const textContent = await page.getTextContent()
+        const pageText = textContent.items
+          .map((item: any) => item.str)
+          .join(' ')
+        fullText += pageText + '\n'
       }
-      reader.readAsText(file)
+
+      return fullText.trim()
+    } catch (error) {
+      console.error('Erro ao extrair texto do PDF:', error)
+      throw new Error('Não foi possível ler o PDF')
+    }
+  }
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Validar tipo de arquivo
+    const validTypes = ['text/plain', 'application/pdf']
+    const validExtensions = ['.txt', '.pdf']
+    const fileExtension = file.name.toLowerCase().slice(file.name.lastIndexOf('.'))
+    
+    if (!validTypes.includes(file.type) && !validExtensions.includes(fileExtension)) {
+      alert('⚠️ Por favor, faça upload apenas de arquivos .txt ou .pdf\n\nPara arquivos DOC/DOCX, copie o conteúdo e cole no campo de texto.')
+      e.target.value = ''
+      return
+    }
+
+    // Validar tamanho (máx 5MB para PDF, 1MB para TXT)
+    const maxSize = file.type === 'application/pdf' || fileExtension === '.pdf' ? 5 * 1024 * 1024 : 1 * 1024 * 1024
+    if (file.size > maxSize) {
+      const maxSizeText = file.type === 'application/pdf' || fileExtension === '.pdf' ? '5MB' : '1MB'
+      alert(`⚠️ Arquivo muito grande!\n\nO arquivo deve ter no máximo ${maxSizeText}. Tente um arquivo menor ou cole o texto diretamente.`)
+      e.target.value = ''
+      return
+    }
+
+    setUploadedFile(file)
+    setUserData('⏳ Processando arquivo...')
+
+    try {
+      let text = ''
+
+      if (file.type === 'application/pdf' || fileExtension === '.pdf') {
+        // Processar PDF
+        text = await extractTextFromPDF(file)
+      } else {
+        // Processar TXT
+        text = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader()
+          reader.onload = (event) => resolve(event.target?.result as string)
+          reader.onerror = () => reject(new Error('Erro ao ler arquivo'))
+          reader.readAsText(file, 'UTF-8')
+        })
+      }
+
+      if (text.trim().length === 0) {
+        alert('⚠️ Arquivo vazio!\n\nO arquivo não contém texto.')
+        setUploadedFile(null)
+        setUserData('')
+        e.target.value = ''
+        return
+      }
+
+      setUserData(text)
+    } catch (error) {
+      console.error('Erro ao processar arquivo:', error)
+      alert('❌ Erro ao processar arquivo.\n\nTente novamente ou cole o texto diretamente.')
+      setUploadedFile(null)
+      setUserData('')
+      e.target.value = ''
     }
   }
 
@@ -512,7 +587,7 @@ export default function SkillsComparison() {
               <input
                 ref={fileInputRef}
                 type="file"
-                accept=".txt,.pdf,.doc,.docx"
+                accept=".txt,.pdf"
                 onChange={handleFileUpload}
                 className={styles.fileInput}
                 id="fileUpload"
