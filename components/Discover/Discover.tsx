@@ -80,7 +80,7 @@ export default function Discover({ id }: DiscoverProps) {
             pauseDuration={3000}
             className={decryptedStyles.revealed}
             encryptedClassName={decryptedStyles.encrypted}
-            parentClassName={decryptedStyles.decryptedText}
+            parentClassName={styles.multiLineText}
           />
         </div>
         <div className={styles.small}>
