@@ -2,7 +2,7 @@
 
 .product {
   width: 100%;
-  padding: 8rem 2rem;
+  padding: 10rem 2rem 12rem 2rem;
   box-sizing: border-box;
   position: relative;
   overflow: hidden;
@@ -33,30 +33,26 @@
   background-size: 200% 200%;
   font-family: v.$font-title;
   line-height: 1.1;
+  position: relative;
+  z-index: 1;
 }
 
 .subtitle {
-  font-size: clamp(1.125rem, 2vw, 1.375rem);
-  color: rgba(255, 255, 255, 0.7);
+  font-size: clamp(0.938rem, 1.5vw, 1.063rem);
+  color: rgba(255, 255, 255, 0.65);
   text-align: center;
   margin: 0 auto 3rem auto;
   max-width: 600px;
   font-weight: 400;
   line-height: 1.6;
+  font-style: italic;
+  position: relative;
+  z-index: 1;
 }
 
-.autocompleteWrapper {
-  margin: 0 auto 1.5rem auto;
-  max-width: 800px;
+.comparisonWrapper {
+  margin: 5rem auto 0 auto;
   width: 100%;
-}
-
-.hint {
-  font-size: 0.938rem;
-  color: rgba(255, 255, 255, 0.5);
-  text-align: center;
-  margin: 0;
-  font-weight: 400;
 }
 
 @media (max-width: 768px) {
@@ -74,11 +70,7 @@
     margin-bottom: 2rem;
   }
 
-  .autocompleteWrapper {
-    margin-bottom: 1rem;
-  }
-
-  .hint {
-    font-size: 0.875rem;
+  .comparisonWrapper {
+    margin-top: 2rem;
   }
 }
