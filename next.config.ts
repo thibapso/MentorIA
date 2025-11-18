@@ -1,7 +1,15 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Configurações para API Routes e Prisma
+  serverExternalPackages: ['@prisma/client', 'prisma'],
+  
+  // Otimizações
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '2mb',
+    },
+  },
 };
 
 export default nextConfig;
