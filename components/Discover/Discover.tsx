@@ -84,10 +84,11 @@ export default function Discover({ id }: DiscoverProps) {
           />
         </div>
         <div className={styles.small}>
-          <Folder
-            size={1.25}
-            color="#3b82f6"
-            items={[
+          <div className={styles.folderWrapper}>
+            <Folder
+              size={1.25}
+              color="#3b82f6"
+              items={[
               <Image
                 key="1"
                 src="/folder/1.webp"
@@ -113,7 +114,8 @@ export default function Discover({ id }: DiscoverProps) {
                 style={{ objectFit: "cover" }}
               />,
             ]}
-          />
+            />
+          </div>
         </div>
         <div className={styles.small}>
           <Globe />
