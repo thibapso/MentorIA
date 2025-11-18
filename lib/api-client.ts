@@ -1,4 +1,14 @@
-const API_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+// Detecta automaticamente a URL base
+const getAPIUrl = () => {
+  // Em produção (Vercel), usa a URL do site
+  if (typeof window !== 'undefined') {
+    return window.location.origin
+  }
+  // No servidor, usa a variável de ambiente ou localhost
+  return process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+}
+
+const API_URL = getAPIUrl()
 
 export interface SkillsMatch {
   id: number
