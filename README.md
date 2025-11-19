@@ -2,6 +2,8 @@
 
 > Às vezes, o que falta não é talento. É MentorIA.
 
+![Image](https://github.com/user-attachments/assets/9408efba-a730-4abe-947f-2a0d2cd9db96)
+
 Uma plataforma inteligente que conecta profissionais às competências essenciais de suas áreas, ajudando você a descobrir seu caminho com propósito e autoconfiança.
 
 ## ✨ Funcionalidades
@@ -19,8 +21,8 @@ Next.js 16 · React 19 · TypeScript · Prisma · PostgreSQL · SASS · Framer M
 
 ```bash
 # Clone o repositório
-git clone https://github.com/seu-usuario/mentoria.git
-cd mentoria
+git clone https://github.com/thibapso/MentorIA.git
+cd MentorIA
 
 # Instale as dependências
 npm install
